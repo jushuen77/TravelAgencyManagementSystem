@@ -20,6 +20,7 @@ int customerSignup(vector<Customer>& customers) {
 
 int customerLogin(const vector<Customer>& customers) {
     cout << "\n--- Customer Login ---\n";
+    cout << "(Enter 0 to cancel.)\n";
     string email = readLine("Email: ");
     string password = readLine("Password: ");
     for (const auto& c : customers) {
@@ -31,6 +32,7 @@ int customerLogin(const vector<Customer>& customers) {
 
 bool staffLogin(const vector<Staff>& staffList) {
     cout << "\n--- Staff Login ---\n";
+    cout << "(Enter 0 to cancel.)\n";
     string username = readLine("Username: ");
     string password = readLine("Password: ");
     for (const auto& s : staffList) {

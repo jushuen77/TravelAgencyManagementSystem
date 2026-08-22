@@ -33,34 +33,38 @@ void customerPortalMenu(int customerID, vector<Customer>& customers, vector<Book
              << "7. Update My Profile\n"
              << "0. Logout\n";
         choice = readMenuChoice(0, 7);
-        switch (choice) {
-            case 1:
-                displayAvailablePackages(packages);
-                break;
-            case 2:
-                bookPackage(bookings, packages, customerID);
-                break;
-            case 3:
-                viewItinerary(bookings, packages, customerID);
-                break;
-            case 4: {
-                int bookingID = readInt("Enter your booking ID to cancel: ");
-                if (!bookingBelongsTo(bookings, bookingID, customerID)) cout << "That booking does not belong to you.\n";
-                else cancelBooking(bookings, packages, bookingID);
-                break;
+        try {
+            switch (choice) {
+                case 1:
+                    displayAvailablePackages(packages);
+                    break;
+                case 2:
+                    bookPackage(bookings, packages, customerID);
+                    break;
+                case 3:
+                    viewItinerary(bookings, packages, customerID);
+                    break;
+                case 4: {
+                    int bookingID = readInt("Enter your booking ID to cancel: ");
+                    if (!bookingBelongsTo(bookings, bookingID, customerID)) cout << "That booking does not belong to you.\n";
+                    else cancelBooking(bookings, packages, bookingID);
+                    break;
+                }
+                case 5: {
+                    int bookingID = readInt("Enter your booking ID to pay for: ");
+                    if (!bookingBelongsTo(bookings, bookingID, customerID)) cout << "That booking does not belong to you.\n";
+                    else payForBooking(invoices, bookings, packages, customers, bookingID);
+                    break;
+                }
+                case 6:
+                    if (idx != -1) printCustomerProfile(customers[idx]);
+                    break;
+                case 7:
+                    updateCustomer(customers, customerID);
+                    break;
             }
-            case 5: {
-                int bookingID = readInt("Enter your booking ID to pay for: ");
-                if (!bookingBelongsTo(bookings, bookingID, customerID)) cout << "That booking does not belong to you.\n";
-                else payForBooking(invoices, bookings, packages, customers, bookingID);
-                break;
-            }
-            case 6:
-                if (idx != -1) printCustomerProfile(customers[idx]);
-                break;
-            case 7:
-                updateCustomer(customers, customerID);
-                break;
+        } catch (const InputCancelled&) {
+            cout << "\nCancelled.\n";
         }
     } while (choice != 0);
     cout << "Logged out.\n";
@@ -104,24 +108,28 @@ int main() {
              << "3. Staff Login\n"
              << "0. Exit\n";
         choice = readMenuChoice(0, 3);
-        switch (choice) {
-            case 1: {
-                int custID = customerLogin(customers);
-                if (custID != -1) customerPortalMenu(custID, customers, bookings, packages, invoices);
-                break;
+        try {
+            switch (choice) {
+                case 1: {
+                    int custID = customerLogin(customers);
+                    if (custID != -1) customerPortalMenu(custID, customers, bookings, packages, invoices);
+                    break;
+                }
+                case 2: {
+                    int custID = customerSignup(customers);
+                    cout << "Account created! Logging you in...\n";
+                    customerPortalMenu(custID, customers, bookings, packages, invoices);
+                    break;
+                }
+                case 3:
+                    if (staffLogin(staffList)) staffMenu(customers, bookings, packages, invoices);
+                    break;
+                case 0:
+                    cout << "Thank you for using the Travel Agency Management System. Goodbye!\n";
+                    break;
             }
-            case 2: {
-                int custID = customerSignup(customers);
-                cout << "Account created! Logging you in...\n";
-                customerPortalMenu(custID, customers, bookings, packages, invoices);
-                break;
-            }
-            case 3:
-                if (staffLogin(staffList)) staffMenu(customers, bookings, packages, invoices);
-                break;
-            case 0:
-                cout << "Thank you for using the Travel Agency Management System. Goodbye!\n";
-                break;
+        } catch (const InputCancelled&) {
+            cout << "\nCancelled.\n";
         }
     } while (choice != 0);
 

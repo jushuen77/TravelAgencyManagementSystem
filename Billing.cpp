@@ -25,8 +25,12 @@ double calculateTotal(double packagePrice, int numPeople, double discountRate) {
 bool processPayment(vector<Invoice>& invoices, int bookingID, double amountDue) {
     cout << fixed << setprecision(2);
     cout << "Amount due: $" << amountDue << "\n";
-    cout << "Select payment method:\n  1. Cash\n  2. Card\n  3. E-Wallet\n";
-    int methodChoice = readMenuChoice(1, 3);
+    cout << "Select payment method:\n  1. Cash\n  2. Card\n  3. E-Wallet\n  0. Cancel\n";
+    int methodChoice = readMenuChoice(0, 3);
+    if (methodChoice == 0) {
+        cout << "Payment cancelled.\n";
+        return false;
+    }
     string method = (methodChoice == 1) ? "Cash" : (methodChoice == 2) ? "Card" : "E-Wallet";
 
     double amountPaid = readDouble("Enter payment amount: $");
@@ -129,15 +133,19 @@ void billingMenu(vector<Invoice>& invoices, const vector<Booking>& bookings,
              << "2. View Sales Report\n"
              << "0. Back to Main Menu\n";
         choice = readMenuChoice(0, 2);
-        switch (choice) {
-            case 1: {
-                int bookingID = readInt("Enter booking ID to pay for: ");
-                payForBooking(invoices, bookings, packages, customers, bookingID);
-                break;
+        try {
+            switch (choice) {
+                case 1: {
+                    int bookingID = readInt("Enter booking ID to pay for: ");
+                    payForBooking(invoices, bookings, packages, customers, bookingID);
+                    break;
+                }
+                case 2:
+                    generateSalesReport(invoices);
+                    break;
             }
-            case 2:
-                generateSalesReport(invoices);
-                break;
+        } catch (const InputCancelled&) {
+            cout << "\nCancelled.\n";
         }
     } while (choice != 0);
 }

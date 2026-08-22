@@ -40,6 +40,7 @@ int readInt(const string& prompt) {
         cout << prompt;
         if (cin >> value) {
             ignoreLine();
+            if (value == 0) throw InputCancelled{};
             return value;
         }
         exitOnEOF();
@@ -55,6 +56,7 @@ double readDouble(const string& prompt) {
         cout << prompt;
         if (cin >> value) {
             ignoreLine();
+            if (value == 0) throw InputCancelled{};
             return value;
         }
         exitOnEOF();
@@ -70,5 +72,6 @@ string readLine(const string& prompt) {
     if (!getline(cin, line)) {
         exitOnEOF();
     }
+    if (line == "0") throw InputCancelled{};
     return line;
 }

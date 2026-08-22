@@ -45,6 +45,7 @@ namespace {
 }
 
 void registerCustomer(vector<Customer>& customers) {
+    cout << "(Enter 0 at any prompt to cancel.)\n";
     Customer c;
 
     string name;
@@ -104,6 +105,7 @@ bool updateCustomer(vector<Customer>& customers, int id) {
 
     Customer& c = customers[idx];
 
+    cout << "(Enter 0 at any prompt to cancel the update.)\n";
     string name = readLine("Enter new name (blank to keep \"" + c.name + "\"): ");
     if (!name.empty()) c.name = name;
 
@@ -167,33 +169,37 @@ void customerMenu(vector<Customer>& customers) {
              << "5. View All Customers\n"
              << "0. Back to Main Menu\n";
         choice = readMenuChoice(0, 5);
-        switch (choice) {
-            case 1:
-                registerCustomer(customers);
-                break;
-            case 2: {
-                int id = readInt("Enter customer ID: ");
-                updateCustomer(customers, id);
-                break;
-            }
-            case 3: {
-                int id = readInt("Enter customer ID: ");
-                deleteCustomer(customers, id);
-                break;
-            }
-            case 4: {
-                int id = readInt("Enter customer ID: ");
-                int idx = findCustomerByID(customers, id);
-                if (idx == -1) {
-                    cout << "Customer not found.\n";
-                } else {
-                    printCustomerProfile(customers[idx]);
+        try {
+            switch (choice) {
+                case 1:
+                    registerCustomer(customers);
+                    break;
+                case 2: {
+                    int id = readInt("Enter customer ID: ");
+                    updateCustomer(customers, id);
+                    break;
                 }
-                break;
+                case 3: {
+                    int id = readInt("Enter customer ID: ");
+                    deleteCustomer(customers, id);
+                    break;
+                }
+                case 4: {
+                    int id = readInt("Enter customer ID: ");
+                    int idx = findCustomerByID(customers, id);
+                    if (idx == -1) {
+                        cout << "Customer not found.\n";
+                    } else {
+                        printCustomerProfile(customers[idx]);
+                    }
+                    break;
+                }
+                case 5:
+                    displayAllCustomers(customers);
+                    break;
             }
-            case 5:
-                displayAllCustomers(customers);
-                break;
+        } catch (const InputCancelled&) {
+            cout << "\nCancelled.\n";
         }
     } while (choice != 0);
 }

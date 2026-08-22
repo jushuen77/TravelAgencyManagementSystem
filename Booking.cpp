@@ -44,6 +44,7 @@ int findPackageByID(const vector<Package>& packages, int id) {
 
 bool bookPackage(vector<Booking>& bookings, vector<Package>& packages, int customerID) {
     displayAvailablePackages(packages);
+    cout << "(Enter 0 to cancel.)\n";
     int packageID = readInt("Enter package ID to book: ");
     int pIdx = findPackageByID(packages, packageID);
     if (pIdx == -1) {
@@ -119,29 +120,33 @@ void bookingMenu(vector<Booking>& bookings, vector<Package>& packages, const vec
              << "4. View Itinerary\n"
              << "0. Back to Main Menu\n";
         choice = readMenuChoice(0, 4);
-        switch (choice) {
-            case 1:
-                displayAvailablePackages(packages);
-                break;
-            case 2: {
-                int custID = readInt("Enter your customer ID: ");
-                if (findCustomerByID(customers, custID) == -1) {
-                    cout << "Customer ID not found. Please register first.\n";
+        try {
+            switch (choice) {
+                case 1:
+                    displayAvailablePackages(packages);
+                    break;
+                case 2: {
+                    int custID = readInt("Enter your customer ID: ");
+                    if (findCustomerByID(customers, custID) == -1) {
+                        cout << "Customer ID not found. Please register first.\n";
+                        break;
+                    }
+                    bookPackage(bookings, packages, custID);
                     break;
                 }
-                bookPackage(bookings, packages, custID);
-                break;
+                case 3: {
+                    int bID = readInt("Enter booking ID to cancel: ");
+                    cancelBooking(bookings, packages, bID);
+                    break;
+                }
+                case 4: {
+                    int custID = readInt("Enter customer ID: ");
+                    viewItinerary(bookings, packages, custID);
+                    break;
+                }
             }
-            case 3: {
-                int bID = readInt("Enter booking ID to cancel: ");
-                cancelBooking(bookings, packages, bID);
-                break;
-            }
-            case 4: {
-                int custID = readInt("Enter customer ID: ");
-                viewItinerary(bookings, packages, custID);
-                break;
-            }
+        } catch (const InputCancelled&) {
+            cout << "\nCancelled.\n";
         }
     } while (choice != 0);
 }
