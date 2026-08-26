@@ -13,13 +13,13 @@ vector<Staff> createSeedStaff() {
 }
 
 int customerSignup(vector<Customer>& customers) {
-    cout << "\n--- Customer Sign Up ---\n";
+    printSectionHeader("Customer Sign Up");
     registerCustomer(customers);
     return customers.back().id;
 }
 
 int customerLogin(const vector<Customer>& customers) {
-    cout << "\n--- Customer Login ---\n";
+    printSectionHeader("Customer Login");
     cout << "(Enter 0 to cancel.)\n";
     string email = readLine("Email: ");
     string password = readLine("Password: ");
@@ -31,7 +31,7 @@ int customerLogin(const vector<Customer>& customers) {
 }
 
 bool staffLogin(const vector<Staff>& staffList) {
-    cout << "\n--- Staff Login ---\n";
+    printSectionHeader("Staff Login");
     cout << "(Enter 0 to cancel.)\n";
     string username = readLine("Username: ");
     string password = readLine("Password: ");

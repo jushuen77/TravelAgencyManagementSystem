@@ -24,6 +24,7 @@ void displayAvailablePackages(const vector<Package>& packages) {
         cout << "No packages available.\n";
         return;
     }
+    cout << "\n" << centerText("Available Trip Packages", 75) << "\n";
     cout << left
          << setw(5) << "ID" << setw(24) << "Package" << setw(22) << "Destination"
          << setw(6) << "Days" << setw(10) << "Price" << setw(8) << "Seats" << "\n";
@@ -95,7 +96,7 @@ bool cancelBooking(vector<Booking>& bookings, vector<Package>& packages, int boo
 
 void viewItinerary(const vector<Booking>& bookings, const vector<Package>& packages, int customerID) {
     bool found = false;
-    cout << "\n--- Itinerary for Customer ID " << customerID << " ---\n";
+    printSectionHeader("Itinerary for Customer ID " + to_string(customerID));
     for (const auto& b : bookings) {
         if (b.customerID == customerID) {
             found = true;
@@ -113,12 +114,12 @@ void viewItinerary(const vector<Booking>& bookings, const vector<Package>& packa
 void bookingMenu(vector<Booking>& bookings, vector<Package>& packages, const vector<Customer>& customers) {
     int choice;
     do {
-        cout << "\n--- Trip Package Booking & Itinerary Management ---\n"
-             << "1. Browse Available Packages\n"
-             << "2. Book a Package\n"
-             << "3. Cancel a Booking\n"
-             << "4. View Itinerary\n"
-             << "0. Back to Main Menu\n";
+        printSectionHeader("Trip Package Booking & Itinerary Management");
+        cout << "  1. Browse Available Packages\n"
+             << "  2. Book a Package\n"
+             << "  3. Cancel a Booking\n"
+             << "  4. View Itinerary\n"
+             << "  0. Back to Main Menu\n";
         choice = readMenuChoice(0, 4);
         try {
             switch (choice) {

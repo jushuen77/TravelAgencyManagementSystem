@@ -147,6 +147,7 @@ void displayAllCustomers(const vector<Customer>& customers) {
         cout << "No customers registered yet.\n";
         return;
     }
+    cout << "\n" << centerText("Registered Customers", 88) << "\n";
     cout << left
          << setw(6) << "ID" << setw(20) << "Name" << setw(25) << "Email"
          << setw(15) << "Phone" << setw(12) << "Tier" << setw(10) << "Points" << "\n";
@@ -161,13 +162,13 @@ void displayAllCustomers(const vector<Customer>& customers) {
 void customerMenu(vector<Customer>& customers) {
     int choice;
     do {
-        cout << "\n--- Customer / Member Management ---\n"
-             << "1. Register New Customer\n"
-             << "2. Update Customer\n"
-             << "3. Delete Customer\n"
-             << "4. Search Customer by ID\n"
-             << "5. View All Customers\n"
-             << "0. Back to Main Menu\n";
+        printSectionHeader("Customer / Member Management");
+        cout << "  1. Register New Customer\n"
+             << "  2. Update Customer\n"
+             << "  3. Delete Customer\n"
+             << "  4. Search Customer by ID\n"
+             << "  5. View All Customers\n"
+             << "  0. Back to Main Menu\n";
         choice = readMenuChoice(0, 5);
         try {
             switch (choice) {

@@ -62,16 +62,16 @@ bool processPayment(vector<Invoice>& invoices, int bookingID, double amountDue) 
 }
 
 void generateInvoice(const Invoice& invoice) {
-    cout << "\n========== INVOICE ==========\n";
-    cout << left << setw(18) << "Invoice ID:" << invoice.id << "\n";
-    cout << left << setw(18) << "Booking ID:" << invoice.bookingID << "\n";
+    printBanner("INVOICE");
+    cout << left << setw(20) << "  Invoice ID:" << invoice.id << "\n";
+    cout << left << setw(20) << "  Booking ID:" << invoice.bookingID << "\n";
     cout << fixed << setprecision(2);
-    cout << left << setw(18) << "Subtotal:" << "$" << invoice.subtotal << "\n";
-    cout << left << setw(18) << "SST Tax (6%):" << "$" << invoice.tax << "\n";
-    cout << left << setw(18) << "Total Paid:" << "$" << invoice.totalAmount << "\n";
-    cout << left << setw(18) << "Payment Method:" << invoice.paymentMethod << "\n";
-    cout << left << setw(18) << "Status:" << invoice.paymentStatus << "\n";
-    cout << "==============================\n";
+    cout << left << setw(20) << "  Subtotal:" << "$" << invoice.subtotal << "\n";
+    cout << left << setw(20) << "  SST Tax (6%):" << "$" << invoice.tax << "\n";
+    cout << left << setw(20) << "  Total Paid:" << "$" << invoice.totalAmount << "\n";
+    cout << left << setw(20) << "  Payment Method:" << invoice.paymentMethod << "\n";
+    cout << left << setw(20) << "  Status:" << invoice.paymentStatus << "\n";
+    cout << string(getTerminalWidth(), '=') << "\n";
 }
 
 void generateSalesReport(const vector<Invoice>& invoices) {
@@ -82,7 +82,7 @@ void generateSalesReport(const vector<Invoice>& invoices) {
     double totalRevenue = 0;
     for (const auto& inv : invoices) totalRevenue += inv.totalAmount;
 
-    cout << "\n--- Sales Report ---\n";
+    printSectionHeader("Sales Report");
     cout << left << setw(10) << "InvID" << setw(10) << "BookID" << setw(12) << "Method" << setw(10) << "Total" << "\n";
     cout << string(42, '-') << "\n";
     cout << fixed << setprecision(2);
@@ -128,10 +128,10 @@ void billingMenu(vector<Invoice>& invoices, const vector<Booking>& bookings,
                   const vector<Package>& packages, const vector<Customer>& customers) {
     int choice;
     do {
-        cout << "\n--- Billing / Payment & Reporting ---\n"
-             << "1. Process Payment for a Booking\n"
-             << "2. View Sales Report\n"
-             << "0. Back to Main Menu\n";
+        printSectionHeader("Billing / Payment & Reporting");
+        cout << "  1. Process Payment for a Booking\n"
+             << "  2. View Sales Report\n"
+             << "  0. Back to Main Menu\n";
         choice = readMenuChoice(0, 2);
         try {
             switch (choice) {

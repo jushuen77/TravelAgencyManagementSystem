@@ -2,6 +2,10 @@
 #include <iostream>
 #include <limits>
 #include <cstdlib>
+#include <algorithm>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 using namespace std;
 
 namespace {
@@ -74,4 +78,30 @@ string readLine(const string& prompt) {
     }
     if (line == "0") throw InputCancelled{};
     return line;
+}
+
+int getTerminalWidth() {
+    int width = 80; // fallback when the width can't be queried (e.g. piped/redirected output)
+#ifdef _WIN32
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi)) {
+        width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    }
+#endif
+    return clamp(width, 40, 100); // keep banners readable, not stretched across an ultra-wide window
+}
+
+string centerText(const string& text, int width) {
+    if (static_cast<int>(text.length()) >= width) return text;
+    int pad = (width - static_cast<int>(text.length())) / 2;
+    return string(pad, ' ') + text;
+}
+
+void printBanner(const string& title) {
+    string border(getTerminalWidth(), '=');
+    cout << "\n" << border << "\n" << centerText(title) << "\n" << border << "\n";
+}
+
+void printSectionHeader(const string& title) {
+    cout << "\n" << centerText(title) << "\n" << string(getTerminalWidth(), '-') << "\n";
 }

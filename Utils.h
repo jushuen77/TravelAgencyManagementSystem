@@ -16,4 +16,12 @@ int readInt(const std::string& prompt);
 double readDouble(const std::string& prompt);
 std::string readLine(const std::string& prompt);
 
+// Shared console formatting so every menu/header/table looks consistent.
+// Width is read from the actual terminal (clamped to a sane range) so
+// headers center correctly regardless of window size.
+int getTerminalWidth();
+std::string centerText(const std::string& text, int width = getTerminalWidth());
+void printBanner(const std::string& title);        // heavy '=' box, top-level screens
+void printSectionHeader(const std::string& title);  // centered title + '-' divider, submenus
+
 #endif

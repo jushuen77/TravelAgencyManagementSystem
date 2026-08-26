@@ -23,15 +23,15 @@ void customerPortalMenu(int customerID, vector<Customer>& customers, vector<Book
     do {
         int idx = findCustomerByID(customers, customerID);
         string name = (idx == -1) ? "Customer" : customers[idx].name;
-        cout << "\n--- Welcome, " << name << " ---\n"
-             << "1. Browse Packages\n"
-             << "2. Book a Package\n"
-             << "3. View My Itinerary\n"
-             << "4. Cancel My Booking\n"
-             << "5. Make Payment\n"
-             << "6. View My Profile\n"
-             << "7. Update My Profile\n"
-             << "0. Logout\n";
+        printSectionHeader("Welcome, " + name);
+        cout << "  1. Browse Packages\n"
+             << "  2. Book a Package\n"
+             << "  3. View My Itinerary\n"
+             << "  4. Cancel My Booking\n"
+             << "  5. Make Payment\n"
+             << "  6. View My Profile\n"
+             << "  7. Update My Profile\n"
+             << "  0. Logout\n";
         choice = readMenuChoice(0, 7);
         try {
             switch (choice) {
@@ -74,11 +74,11 @@ void staffMenu(vector<Customer>& customers, vector<Booking>& bookings,
                vector<Package>& packages, vector<Invoice>& invoices) {
     int choice;
     do {
-        cout << "\n--- Staff Menu ---\n"
-             << "1. Customer Management\n"
-             << "2. Trip Package Booking & Itinerary\n"
-             << "3. Billing / Payment & Reporting\n"
-             << "0. Logout\n";
+        printSectionHeader("Staff Menu");
+        cout << "  1. Customer Management\n"
+             << "  2. Trip Package Booking & Itinerary\n"
+             << "  3. Billing / Payment & Reporting\n"
+             << "  0. Logout\n";
         choice = readMenuChoice(0, 3);
         switch (choice) {
             case 1: customerMenu(customers); break;
@@ -100,13 +100,11 @@ int main() {
 
     int choice;
     do {
-        cout << "\n=========================================\n"
-             << "   TRAVEL AGENCY MANAGEMENT SYSTEM\n"
-             << "=========================================\n"
-             << "1. Customer Login\n"
-             << "2. Customer Sign Up\n"
-             << "3. Staff Login\n"
-             << "0. Exit\n";
+        printBanner("FREERIDE TRAVEL AGENCY MANAGEMENT SYSTEM");
+        cout << "  1. Customer Login\n"
+             << "  2. Customer Sign Up\n"
+             << "  3. Staff Login\n"
+             << "  0. Exit\n";
         choice = readMenuChoice(0, 3);
         try {
             switch (choice) {
@@ -125,7 +123,7 @@ int main() {
                     if (staffLogin(staffList)) staffMenu(customers, bookings, packages, invoices);
                     break;
                 case 0:
-                    cout << "Thank you for using the Travel Agency Management System. Goodbye!\n";
+                    cout << "Thank you for using FreeRide Travel Agency Management System. Goodbye!\n";
                     break;
             }
         } catch (const InputCancelled&) {
