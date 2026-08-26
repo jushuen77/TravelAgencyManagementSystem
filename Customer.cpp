@@ -176,11 +176,13 @@ void customerMenu(vector<Customer>& customers) {
                     registerCustomer(customers);
                     break;
                 case 2: {
+                    displayAllCustomers(customers);
                     int id = readInt("Enter customer ID: ");
                     updateCustomer(customers, id);
                     break;
                 }
                 case 3: {
+                    displayAllCustomers(customers);
                     int id = readInt("Enter customer ID: ");
                     deleteCustomer(customers, id);
                     break;

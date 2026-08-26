@@ -136,6 +136,7 @@ void billingMenu(vector<Invoice>& invoices, const vector<Booking>& bookings,
         try {
             switch (choice) {
                 case 1: {
+                    viewAllBookings(bookings, packages, customers);
                     int bookingID = readInt("Enter booking ID to pay for: ");
                     payForBooking(invoices, bookings, packages, customers, bookingID);
                     break;

@@ -45,12 +45,14 @@ void customerPortalMenu(int customerID, vector<Customer>& customers, vector<Book
                     viewItinerary(bookings, packages, customerID);
                     break;
                 case 4: {
+                    viewItinerary(bookings, packages, customerID);
                     int bookingID = readInt("Enter your booking ID to cancel: ");
                     if (!bookingBelongsTo(bookings, bookingID, customerID)) cout << "That booking does not belong to you.\n";
                     else cancelBooking(bookings, packages, bookingID);
                     break;
                 }
                 case 5: {
+                    viewItinerary(bookings, packages, customerID);
                     int bookingID = readInt("Enter your booking ID to pay for: ");
                     if (!bookingBelongsTo(bookings, bookingID, customerID)) cout << "That booking does not belong to you.\n";
                     else payForBooking(invoices, bookings, packages, customers, bookingID);

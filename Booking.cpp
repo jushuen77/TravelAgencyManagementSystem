@@ -264,6 +264,7 @@ void bookingMenu(vector<Booking>& bookings, vector<Package>& packages, const vec
                     break;
                 }
                 case 4: {
+                    displayAllCustomers(customers);
                     int custID = readInt("Enter your customer ID: ");
                     if (findCustomerByID(customers, custID) == -1) {
                         cout << "Customer ID not found. Please register first.\n";
@@ -273,11 +274,13 @@ void bookingMenu(vector<Booking>& bookings, vector<Package>& packages, const vec
                     break;
                 }
                 case 5: {
+                    viewAllBookings(bookings, packages, customers);
                     int bID = readInt("Enter booking ID to cancel: ");
                     cancelBooking(bookings, packages, bID);
                     break;
                 }
                 case 6: {
+                    displayAllCustomers(customers);
                     int custID = readInt("Enter customer ID: ");
                     viewItinerary(bookings, packages, custID);
                     break;
