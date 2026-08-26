@@ -5,6 +5,9 @@
 #include <algorithm>
 #ifdef _WIN32
 #include <windows.h>
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
 #endif
 using namespace std;
 
@@ -16,6 +19,15 @@ namespace {
             cout << "\nInput stream closed. Exiting.\n";
             exit(0);
         }
+    }
+
+    namespace Color {
+        const string RESET  = "\033[0m";
+        const string BOLD   = "\033[1m";
+        const string CYAN   = "\033[36m";
+        const string GREEN  = "\033[32m";
+        const string YELLOW = "\033[33m";
+        const string RED    = "\033[31m";
     }
 }
 
@@ -99,9 +111,26 @@ string centerText(const string& text, int width) {
 
 void printBanner(const string& title) {
     string border(getTerminalWidth(), '=');
-    cout << "\n" << border << "\n" << centerText(title) << "\n" << border << "\n";
+    cout << "\n" << Color::BOLD << Color::CYAN << border << "\n" << centerText(title)
+         << "\n" << border << Color::RESET << "\n";
 }
 
 void printSectionHeader(const string& title) {
-    cout << "\n" << centerText(title) << "\n" << string(getTerminalWidth(), '-') << "\n";
+    cout << "\n" << Color::BOLD << centerText(title) << Color::RESET
+         << "\n" << string(getTerminalWidth(), '-') << "\n";
 }
+
+void enableAnsiColors() {
+#ifdef _WIN32
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE) return;
+    DWORD mode = 0;
+    if (!GetConsoleMode(hOut, &mode)) return; // not a real console (e.g. redirected) - nothing to enable
+    SetConsoleMode(hOut, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+#endif
+}
+
+void printSuccess(const string& msg) { cout << Color::GREEN << msg << Color::RESET << "\n"; }
+void printError(const string& msg)   { cout << Color::RED << msg << Color::RESET << "\n"; }
+void printWarning(const string& msg) { cout << Color::YELLOW << msg << Color::RESET << "\n"; }
+void printInfo(const string& msg)    { cout << Color::CYAN << msg << Color::RESET << "\n"; }

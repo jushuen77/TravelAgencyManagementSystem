@@ -45,21 +45,21 @@ namespace {
 }
 
 void registerCustomer(vector<Customer>& customers) {
-    cout << "(Enter 0 at any prompt to cancel.)\n";
+    printInfo("(Enter 0 at any prompt to cancel.)");
     Customer c;
 
     string name;
     do {
         name = readLine("Enter customer name: ");
-        if (name.empty()) cout << "Name cannot be empty.\n";
+        if (name.empty()) printWarning("Name cannot be empty.");
     } while (name.empty());
     c.name = name;
 
     string email;
     while (true) {
         email = readLine("Enter email: ");
-        if (!isValidEmail(email)) { cout << "Invalid email format.\n"; continue; }
-        if (emailExists(customers, email)) { cout << "An account with this email already exists.\n"; continue; }
+        if (!isValidEmail(email)) { printWarning("Invalid email format."); continue; }
+        if (emailExists(customers, email)) { printWarning("An account with this email already exists."); continue; }
         break;
     }
     c.email = email;
@@ -67,16 +67,16 @@ void registerCustomer(vector<Customer>& customers) {
     string phone;
     do {
         phone = readLine("Enter phone number (digits only): ");
-        if (!isValidPhone(phone)) cout << "Invalid phone number (must be 7-15 digits).\n";
+        if (!isValidPhone(phone)) printWarning("Invalid phone number (must be 7-15 digits).");
     } while (!isValidPhone(phone));
     c.phone = phone;
 
     string password;
     while (true) {
         password = readLine("Create a password (min 4 characters): ");
-        if (password.size() < 4) { cout << "Password too short.\n"; continue; }
+        if (password.size() < 4) { printWarning("Password too short."); continue; }
         string confirm = readLine("Confirm password: ");
-        if (confirm != password) { cout << "Passwords do not match. Try again.\n"; continue; }
+        if (confirm != password) { printWarning("Passwords do not match. Try again."); continue; }
         break;
     }
     c.password = password;
@@ -86,7 +86,7 @@ void registerCustomer(vector<Customer>& customers) {
     c.id = nextCustomerID++;
 
     customers.push_back(c);
-    cout << "Customer registered successfully. Assigned ID: " << c.id << "\n";
+    printSuccess("Customer registered successfully. Assigned ID: " + to_string(c.id));
 }
 
 int findCustomerByID(const vector<Customer>& customers, int id) {
@@ -99,40 +99,40 @@ int findCustomerByID(const vector<Customer>& customers, int id) {
 bool updateCustomer(vector<Customer>& customers, int id) {
     int idx = findCustomerByID(customers, id);
     if (idx == -1) {
-        cout << "Customer ID " << id << " not found.\n";
+        printError("Customer ID " + to_string(id) + " not found.");
         return false;
     }
 
     Customer& c = customers[idx];
 
-    cout << "(Enter 0 at any prompt to cancel the update.)\n";
+    printInfo("(Enter 0 at any prompt to cancel the update.)");
     string name = readLine("Enter new name (blank to keep \"" + c.name + "\"): ");
     if (!name.empty()) c.name = name;
 
     string email = readLine("Enter new email (blank to keep \"" + c.email + "\"): ");
     if (!email.empty()) {
         if (isValidEmail(email)) c.email = email;
-        else cout << "Invalid email format, kept previous value.\n";
+        else printWarning("Invalid email format, kept previous value.");
     }
 
     string phone = readLine("Enter new phone (blank to keep \"" + c.phone + "\"): ");
     if (!phone.empty()) {
         if (isValidPhone(phone)) c.phone = phone;
-        else cout << "Invalid phone number, kept previous value.\n";
+        else printWarning("Invalid phone number, kept previous value.");
     }
 
-    cout << "Customer updated successfully.\n";
+    printSuccess("Customer updated successfully.");
     return true;
 }
 
 bool deleteCustomer(vector<Customer>& customers, int id) {
     int idx = findCustomerByID(customers, id);
     if (idx == -1) {
-        cout << "Customer ID " << id << " not found.\n";
+        printError("Customer ID " + to_string(id) + " not found.");
         return false;
     }
     customers.erase(customers.begin() + idx);
-    cout << "Customer deleted successfully.\n";
+    printSuccess("Customer deleted successfully.");
     return true;
 }
 
@@ -144,7 +144,7 @@ void printCustomerProfile(const Customer& c) {
 
 void displayAllCustomers(const vector<Customer>& customers) {
     if (customers.empty()) {
-        cout << "No customers registered yet.\n";
+        printInfo("No customers registered yet.");
         return;
     }
     cout << "\n" << centerText("Registered Customers", 88) << "\n";
@@ -191,7 +191,7 @@ void customerMenu(vector<Customer>& customers) {
                     int id = readInt("Enter customer ID: ");
                     int idx = findCustomerByID(customers, id);
                     if (idx == -1) {
-                        cout << "Customer not found.\n";
+                        printError("Customer not found.");
                     } else {
                         printCustomerProfile(customers[idx]);
                     }
@@ -202,7 +202,7 @@ void customerMenu(vector<Customer>& customers) {
                     break;
             }
         } catch (const InputCancelled&) {
-            cout << "\nCancelled.\n";
+            printWarning("\nCancelled.");
         }
     } while (choice != 0);
 }

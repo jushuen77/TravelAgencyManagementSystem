@@ -26,7 +26,7 @@ int customerLogin(const vector<Customer>& customers) {
     for (const auto& c : customers) {
         if (c.email == email && c.password == password) return c.id;
     }
-    cout << "Invalid email or password.\n";
+    printError("Invalid email or password.");
     return -1;
 }
 
@@ -38,6 +38,6 @@ bool staffLogin(const vector<Staff>& staffList) {
     for (const auto& s : staffList) {
         if (s.username == username && s.password == password) return true;
     }
-    cout << "Invalid username or password.\n";
+    printError("Invalid username or password.");
     return false;
 }

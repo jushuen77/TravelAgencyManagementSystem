@@ -47,14 +47,14 @@ void customerPortalMenu(int customerID, vector<Customer>& customers, vector<Book
                 case 4: {
                     viewItinerary(bookings, packages, customerID);
                     int bookingID = readInt("Enter your booking ID to cancel: ");
-                    if (!bookingBelongsTo(bookings, bookingID, customerID)) cout << "That booking does not belong to you.\n";
+                    if (!bookingBelongsTo(bookings, bookingID, customerID)) printError("That booking does not belong to you.");
                     else cancelBooking(bookings, packages, bookingID);
                     break;
                 }
                 case 5: {
                     viewItinerary(bookings, packages, customerID);
                     int bookingID = readInt("Enter your booking ID to pay for: ");
-                    if (!bookingBelongsTo(bookings, bookingID, customerID)) cout << "That booking does not belong to you.\n";
+                    if (!bookingBelongsTo(bookings, bookingID, customerID)) printError("That booking does not belong to you.");
                     else payForBooking(invoices, bookings, packages, customers, bookingID);
                     break;
                 }
@@ -66,10 +66,10 @@ void customerPortalMenu(int customerID, vector<Customer>& customers, vector<Book
                     break;
             }
         } catch (const InputCancelled&) {
-            cout << "\nCancelled.\n";
+            printWarning("\nCancelled.");
         }
     } while (choice != 0);
-    cout << "Logged out.\n";
+    printInfo("Logged out.");
 }
 
 void staffMenu(vector<Customer>& customers, vector<Booking>& bookings,
@@ -88,12 +88,14 @@ void staffMenu(vector<Customer>& customers, vector<Booking>& bookings,
             case 3: billingMenu(invoices, bookings, packages, customers); break;
         }
     } while (choice != 0);
-    cout << "Logged out.\n";
+    printInfo("Logged out.");
 }
 
 } // namespace
 
 int main() {
+    enableAnsiColors();
+
     vector<Customer> customers;
     vector<Package> packages = createSamplePackages();
     vector<Booking> bookings;
@@ -117,7 +119,7 @@ int main() {
                 }
                 case 2: {
                     int custID = customerSignup(customers);
-                    cout << "Account created! Logging you in...\n";
+                    printSuccess("Account created! Logging you in...");
                     customerPortalMenu(custID, customers, bookings, packages, invoices);
                     break;
                 }
@@ -125,11 +127,11 @@ int main() {
                     if (staffLogin(staffList)) staffMenu(customers, bookings, packages, invoices);
                     break;
                 case 0:
-                    cout << "Thank you for using FreeRide Travel Agency Management System. Goodbye!\n";
+                    printInfo("Thank you for using FreeRide Travel Agency Management System. Goodbye!");
                     break;
             }
         } catch (const InputCancelled&) {
-            cout << "\nCancelled.\n";
+            printWarning("\nCancelled.");
         }
     } while (choice != 0);
 

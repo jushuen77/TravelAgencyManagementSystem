@@ -4,7 +4,16 @@
 #include "Utils.h"
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 using namespace std;
+
+namespace {
+    string money(double amount) {
+        ostringstream oss;
+        oss << fixed << setprecision(2) << amount;
+        return oss.str();
+    }
+}
 
 namespace {
     int nextInvoiceID = 1; // static/global-style ID counter
@@ -28,18 +37,18 @@ bool processPayment(vector<Invoice>& invoices, int bookingID, double amountDue) 
     cout << "Select payment method:\n  1. Cash\n  2. Card\n  3. E-Wallet\n  0. Cancel\n";
     int methodChoice = readMenuChoice(0, 3);
     if (methodChoice == 0) {
-        cout << "Payment cancelled.\n";
+        printWarning("Payment cancelled.");
         return false;
     }
     string method = (methodChoice == 1) ? "Cash" : (methodChoice == 2) ? "Card" : "E-Wallet";
 
     double amountPaid = readDouble("Enter payment amount: $");
     if (amountPaid <= 0) {
-        cout << "Payment amount must be positive.\n";
+        printWarning("Payment amount must be positive.");
         return false;
     }
     if (amountPaid < amountDue) {
-        cout << "Insufficient payment. Amount due is $" << amountDue << ".\n";
+        printWarning("Insufficient payment. Amount due is $" + money(amountDue) + ".");
         return false;
     }
 
@@ -54,7 +63,7 @@ bool processPayment(vector<Invoice>& invoices, int bookingID, double amountDue) 
     invoices.push_back(inv);
 
     if (amountPaid > amountDue) {
-        cout << "Change due: $" << (amountPaid - amountDue) << "\n";
+        printInfo("Change due: $" + money(amountPaid - amountDue));
     }
 
     generateInvoice(inv);
@@ -76,7 +85,7 @@ void generateInvoice(const Invoice& invoice) {
 
 void generateSalesReport(const vector<Invoice>& invoices) {
     if (invoices.empty()) {
-        cout << "No transactions recorded yet.\n";
+        printInfo("No transactions recorded yet.");
         return;
     }
     double totalRevenue = 0;
@@ -103,17 +112,17 @@ bool payForBooking(vector<Invoice>& invoices, const vector<Booking>& bookings,
         if (b.id == bookingID) { target = &b; break; }
     }
     if (!target) {
-        cout << "Booking not found.\n";
+        printError("Booking not found.");
         return false;
     }
     if (target->status == "Cancelled") {
-        cout << "This booking was cancelled and cannot be paid.\n";
+        printWarning("This booking was cancelled and cannot be paid.");
         return false;
     }
 
     int pIdx = findPackageByID(packages, target->packageID);
     if (pIdx == -1) {
-        cout << "Package data missing for this booking.\n";
+        printError("Package data missing for this booking.");
         return false;
     }
 
@@ -146,7 +155,7 @@ void billingMenu(vector<Invoice>& invoices, const vector<Booking>& bookings,
                     break;
             }
         } catch (const InputCancelled&) {
-            cout << "\nCancelled.\n";
+            printWarning("\nCancelled.");
         }
     } while (choice != 0);
 }

@@ -24,4 +24,17 @@ std::string centerText(const std::string& text, int width = getTerminalWidth());
 void printBanner(const std::string& title);        // heavy '=' box, top-level screens
 void printSectionHeader(const std::string& title);  // centered title + '-' divider, submenus
 
+// Turns on ANSI escape support in classic Windows Command Prompt (Windows
+// Terminal / VS Code already have it on). Call once at program start; a
+// no-op everywhere else. Without this, color codes print as raw "\033[..."
+// text instead of rendering as color.
+void enableAnsiColors();
+
+// Color-coded feedback so success/error/warning messages are visually
+// distinct at a glance instead of blending into plain white text.
+void printSuccess(const std::string& msg);
+void printError(const std::string& msg);
+void printWarning(const std::string& msg);
+void printInfo(const std::string& msg);
+
 #endif

@@ -23,7 +23,7 @@ vector<Package> createSamplePackages() {
 
 void displayAvailablePackages(const vector<Package>& packages) {
     if (packages.empty()) {
-        cout << "No packages available.\n";
+        printInfo("No packages available.");
         return;
     }
     cout << "\n" << centerText("Available Trip Packages", 75) << "\n";
@@ -46,27 +46,27 @@ int findPackageByID(const vector<Package>& packages, int id) {
 }
 
 void addPackage(vector<Package>& packages) {
-    cout << "(Enter 0 at any prompt to cancel.)\n";
+    printInfo("(Enter 0 at any prompt to cancel.)");
     Package p;
 
     string name;
     do {
         name = readLine("Enter package name: ");
-        if (name.empty()) cout << "Package name cannot be empty.\n";
+        if (name.empty()) printWarning("Package name cannot be empty.");
     } while (name.empty());
     p.name = name;
 
     string destination;
     do {
         destination = readLine("Enter destination: ");
-        if (destination.empty()) cout << "Destination cannot be empty.\n";
+        if (destination.empty()) printWarning("Destination cannot be empty.");
     } while (destination.empty());
     p.destination = destination;
 
     int days;
     while (true) {
         days = readInt("Enter duration (days): ");
-        if (days <= 0) { cout << "Duration must be positive.\n"; continue; }
+        if (days <= 0) { printWarning("Duration must be positive."); continue; }
         break;
     }
     p.days = days;
@@ -74,7 +74,7 @@ void addPackage(vector<Package>& packages) {
     double price;
     while (true) {
         price = readDouble("Enter price per person: $");
-        if (price <= 0) { cout << "Price must be positive.\n"; continue; }
+        if (price <= 0) { printWarning("Price must be positive."); continue; }
         break;
     }
     p.price = price;
@@ -82,25 +82,25 @@ void addPackage(vector<Package>& packages) {
     int seats;
     while (true) {
         seats = readInt("Enter number of seats available: ");
-        if (seats <= 0) { cout << "Seats must be positive.\n"; continue; }
+        if (seats <= 0) { printWarning("Seats must be positive."); continue; }
         break;
     }
     p.seatsAvailable = seats;
 
     p.id = nextPackageID++;
     packages.push_back(p);
-    cout << "Package added successfully. Assigned ID: " << p.id << "\n";
+    printSuccess("Package added successfully. Assigned ID: " + to_string(p.id));
 }
 
 bool editPackage(vector<Package>& packages, int id) {
     int idx = findPackageByID(packages, id);
     if (idx == -1) {
-        cout << "Package ID " << id << " not found.\n";
+        printError("Package ID " + to_string(id) + " not found.");
         return false;
     }
 
     Package& p = packages[idx];
-    cout << "(Enter 0 at any prompt to cancel the edit.)\n";
+    printInfo("(Enter 0 at any prompt to cancel the edit.)");
 
     string name = readLine("Enter new name (blank to keep \"" + p.name + "\"): ");
     if (!name.empty()) p.name = name;
@@ -113,9 +113,9 @@ bool editPackage(vector<Package>& packages, int id) {
         try {
             int days = stoi(daysInput);
             if (days > 0) p.days = days;
-            else cout << "Duration must be positive, kept previous value.\n";
+            else printWarning("Duration must be positive, kept previous value.");
         } catch (...) {
-            cout << "Invalid number, kept previous value.\n";
+            printWarning("Invalid number, kept previous value.");
         }
     }
 
@@ -126,9 +126,9 @@ bool editPackage(vector<Package>& packages, int id) {
         try {
             double price = stod(priceInput);
             if (price > 0) p.price = price;
-            else cout << "Price must be positive, kept previous value.\n";
+            else printWarning("Price must be positive, kept previous value.");
         } catch (...) {
-            cout << "Invalid number, kept previous value.\n";
+            printWarning("Invalid number, kept previous value.");
         }
     }
 
@@ -137,33 +137,33 @@ bool editPackage(vector<Package>& packages, int id) {
         try {
             int seats = stoi(seatsInput);
             if (seats >= 0) p.seatsAvailable = seats;
-            else cout << "Seats cannot be negative, kept previous value.\n";
+            else printWarning("Seats cannot be negative, kept previous value.");
         } catch (...) {
-            cout << "Invalid number, kept previous value.\n";
+            printWarning("Invalid number, kept previous value.");
         }
     }
 
-    cout << "Package updated successfully.\n";
+    printSuccess("Package updated successfully.");
     return true;
 }
 
 bool bookPackage(vector<Booking>& bookings, vector<Package>& packages, int customerID) {
     displayAvailablePackages(packages);
-    cout << "(Enter 0 to cancel.)\n";
+    printInfo("(Enter 0 to cancel.)");
     int packageID = readInt("Enter package ID to book: ");
     int pIdx = findPackageByID(packages, packageID);
     if (pIdx == -1) {
-        cout << "Package not found.\n";
+        printError("Package not found.");
         return false;
     }
 
     int numPeople = readInt("Enter number of people: ");
     if (numPeople <= 0) {
-        cout << "Number of people must be positive.\n";
+        printWarning("Number of people must be positive.");
         return false;
     }
     if (packages[pIdx].seatsAvailable < numPeople) {
-        cout << "Not enough seats available. Only " << packages[pIdx].seatsAvailable << " left.\n";
+        printWarning("Not enough seats available. Only " + to_string(packages[pIdx].seatsAvailable) + " left.");
         return false;
     }
 
@@ -176,7 +176,7 @@ bool bookPackage(vector<Booking>& bookings, vector<Package>& packages, int custo
     bookings.push_back(b);
     packages[pIdx].seatsAvailable -= numPeople;
 
-    cout << "Booking confirmed! Booking ID: " << b.id << "\n";
+    printSuccess("Booking confirmed! Booking ID: " + to_string(b.id));
     return true;
 }
 
@@ -184,17 +184,17 @@ bool cancelBooking(vector<Booking>& bookings, vector<Package>& packages, int boo
     for (auto& b : bookings) {
         if (b.id == bookingID) {
             if (b.status == "Cancelled") {
-                cout << "Booking already cancelled.\n";
+                printWarning("Booking already cancelled.");
                 return false;
             }
             int pIdx = findPackageByID(packages, b.packageID);
             if (pIdx != -1) packages[pIdx].seatsAvailable += b.numPeople;
             b.status = "Cancelled";
-            cout << "Booking " << bookingID << " cancelled.\n";
+            printSuccess("Booking " + to_string(bookingID) + " cancelled.");
             return true;
         }
     }
-    cout << "Booking not found.\n";
+    printError("Booking not found.");
     return false;
 }
 
@@ -212,13 +212,13 @@ void viewItinerary(const vector<Booking>& bookings, const vector<Package>& packa
             }
         }
     }
-    if (!found) cout << "No bookings found for this customer.\n";
+    if (!found) printInfo("No bookings found for this customer.");
 }
 
 void viewAllBookings(const vector<Booking>& bookings, const vector<Package>& packages,
                       const vector<Customer>& customers) {
     if (bookings.empty()) {
-        cout << "No bookings recorded yet.\n";
+        printInfo("No bookings recorded yet.");
         return;
     }
     cout << "\n" << centerText("All Bookings", 84) << "\n";
@@ -267,7 +267,7 @@ void bookingMenu(vector<Booking>& bookings, vector<Package>& packages, const vec
                     displayAllCustomers(customers);
                     int custID = readInt("Enter your customer ID: ");
                     if (findCustomerByID(customers, custID) == -1) {
-                        cout << "Customer ID not found. Please register first.\n";
+                        printError("Customer ID not found. Please register first.");
                         break;
                     }
                     bookPackage(bookings, packages, custID);
@@ -290,7 +290,7 @@ void bookingMenu(vector<Booking>& bookings, vector<Package>& packages, const vec
                     break;
             }
         } catch (const InputCancelled&) {
-            cout << "\nCancelled.\n";
+            printWarning("\nCancelled.");
         }
     } while (choice != 0);
 }
