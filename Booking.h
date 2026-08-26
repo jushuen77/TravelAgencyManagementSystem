@@ -9,9 +9,13 @@
 std::vector<Package> createSamplePackages();
 void displayAvailablePackages(const std::vector<Package>& packages);
 int findPackageByID(const std::vector<Package>& packages, int id);
+void addPackage(std::vector<Package>& packages);
+bool editPackage(std::vector<Package>& packages, int id);
 bool bookPackage(std::vector<Booking>& bookings, std::vector<Package>& packages, int customerID);
 bool cancelBooking(std::vector<Booking>& bookings, std::vector<Package>& packages, int bookingID);
 void viewItinerary(const std::vector<Booking>& bookings, const std::vector<Package>& packages, int customerID);
+void viewAllBookings(const std::vector<Booking>& bookings, const std::vector<Package>& packages,
+                      const std::vector<Customer>& customers);
 void bookingMenu(std::vector<Booking>& bookings, std::vector<Package>& packages,
                   const std::vector<Customer>& customers);
 
