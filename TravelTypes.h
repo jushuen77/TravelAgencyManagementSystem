@@ -1,6 +1,5 @@
 #ifndef TRAVELTYPES_H
 #define TRAVELTYPES_H
-
 #include <string>
 
 // Shared named constants (Module 1 / Module 3)

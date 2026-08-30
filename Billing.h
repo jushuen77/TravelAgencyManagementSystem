@@ -8,7 +8,7 @@
 
 double calculateTotal(double packagePrice, int numPeople, double discountRate);
 bool processPayment(std::vector<Invoice>& invoices, int bookingID, double amountDue);
-void generateInvoice(const Invoice& invoice);
+void generateInvoice(const Invoice& invoice, const Booking& booking, const Package& package, const Customer& customer);
 void generateSalesReport(const std::vector<Invoice>& invoices);
 bool payForBooking(std::vector<Invoice>& invoices, const std::vector<Booking>& bookings,
                     const std::vector<Package>& packages, const std::vector<Customer>& customers, int bookingID);
