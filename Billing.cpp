@@ -4,7 +4,6 @@
 #include "Utils.h"
 #include "Voucher.h"
 #include <iostream>
-#include <iomanip>
 #include <vector>
 #include <format>
 using namespace std;
@@ -13,17 +12,8 @@ int nextInvoiceID = 1;
 
 double getMembershipDiscount(const string& tier) {
     if (tier == "Gold") return 0.10;
-
     if (tier == "Silver") return 0.05;
-
     return 0.0;
-}
-
-double calculateTotal(double packagePrice, int numPeople, double discountRate) {
-    double subtotal = packagePrice * numPeople;
-    double discounted = subtotal * (1.0 - discountRate);
-
-    return discounted * (1.0 + SST_RATE);
 }
 
 bool processPayment(vector<Invoice>& invoices, int bookingID, 
@@ -102,7 +92,6 @@ void generateInvoice(const Invoice& invoice, const Booking& booking, const Packa
     vector<int> widths = {20, 30};
 
     printLine('-', 50);
-
 
     printTableRow(
         {"Invoice ID", to_string(invoice.id)},
@@ -235,6 +224,7 @@ bool bookingAlreadyPaid(const vector<Invoice>& invoices,int bookingID) {
 bool payForBooking(vector<Invoice>& invoices, const vector<Booking>& bookings, const vector<Package>& packages,
                     vector<Customer>& customers, vector<Voucher>& vouchers, int bookingID) {
 
+    // find specfic booking
     const Booking* target = nullptr;
 
     for (const auto& b : bookings) {
@@ -311,12 +301,12 @@ bool payForBooking(vector<Invoice>& invoices, const vector<Booking>& bookings, c
             }
         }
 
-        // update earned & redeemable points
+        // Update earned & redeemable points
         int pointsEarned = calculatePointsEarned(amountDue);
         customers[cIdx].earnedPoints += pointsEarned;
         customers[cIdx].redeemablePoints += pointsEarned;
 
-        // update membership tier
+        // Update membership tier
         updateMembershipTier(customers[cIdx]);
 
         showInfo("Loyalty Points Earned: " + to_string(pointsEarned));

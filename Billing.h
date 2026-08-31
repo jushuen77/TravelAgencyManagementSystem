@@ -6,7 +6,6 @@
 
 // Module 3: Billing / Payment & Reporting
 
-double calculateTotal(double packagePrice, int numPeople, double discountRate);
 bool processPayment(std::vector<Invoice>& invoices, int bookingID, double subtotal, double membershipDiscount, double loyaltyDiscount, double amountDue);
 void generateInvoice(const Invoice& invoice, const Booking& booking, const Package& package, const Customer& customer);
 void generateSalesReport(const std::vector<Invoice>& invoices);
