@@ -2,6 +2,7 @@
 #include "Booking.h"
 #include "Customer.h"
 #include "Utils.h"
+#include "Voucher.h"
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -25,14 +26,15 @@ double calculateTotal(double packagePrice, int numPeople, double discountRate) {
     return discounted * (1.0 + SST_RATE);
 }
 
-bool processPayment(vector<Invoice>& invoices, int bookingID, double subtotal, double membershipDiscount, double loyaltyDiscount, double amountDue) {
+bool processPayment(vector<Invoice>& invoices, int bookingID, 
+                    double subtotal, double membershipDiscount, double voucherDiscount, double amountDue) {
     showSectionHeader("Process Payment");
 
     printField("Subtotal: ", format("RM{:.2f}", subtotal));
     printField("Membership Discount: ", format("-RM{:.2f}", membershipDiscount));
-    printField("Loyalty Discount: ",format("-RM{:.2f}", loyaltyDiscount));
+    printField("Voucher Discount: ",format("-RM{:.2f}", voucherDiscount));
 
-    double tax = amountDue - (subtotal - membershipDiscount - loyaltyDiscount);
+    double tax = amountDue - (subtotal - membershipDiscount - voucherDiscount);
     printField("SST Tax: ", format("RM{:.2f}", tax));
     printField("Amount Due: ", format("RM{:.2f}", amountDue));
 
@@ -78,7 +80,7 @@ bool processPayment(vector<Invoice>& invoices, int bookingID, double subtotal, d
     inv.id = nextInvoiceID++;
     inv.bookingID = bookingID;
     inv.subtotal = subtotal;
-    inv.discount = membershipDiscount + loyaltyDiscount;
+    inv.discount = membershipDiscount + voucherDiscount;
     inv.tax = tax;
     inv.totalAmount = amountDue;
     inv.paymentMethod = method;
@@ -231,7 +233,7 @@ bool bookingAlreadyPaid(const vector<Invoice>& invoices,int bookingID) {
 }
 
 bool payForBooking(vector<Invoice>& invoices, const vector<Booking>& bookings, const vector<Package>& packages,
-                    vector<Customer>& customers, int bookingID) {
+                    vector<Customer>& customers, vector<Voucher>& vouchers, int bookingID) {
 
     const Booking* target = nullptr;
 
@@ -271,6 +273,8 @@ bool payForBooking(vector<Invoice>& invoices, const vector<Booking>& bookings, c
         return false;
     }
 
+    // Membership discount
+
     double discountRate = getMembershipDiscount(customers[cIdx].membershipTier);
 
     double subtotal = packages[pIdx].price * target->numPeople;
@@ -279,27 +283,37 @@ bool payForBooking(vector<Invoice>& invoices, const vector<Booking>& bookings, c
 
     double discountedSubtotal = subtotal - membershipDiscount;
 
-    // Calculate loyalty discount
-    int pointsUsed = 0;
-    double loyaltyDiscount = 0.0;
+    // Calculate voucher discount
+    int selectedVoucherID = -1;
+    double voucherDiscount = 0.0;
 
-    if (customers[cIdx].loyaltyPoints > 0) {
-        char redeem = getChar("Would you like to redeem loyalty points (Y/N): ", true);
+    char useVoucher = getChar("Would you like to use a voucher (Y/N): ", true);
 
-        if (redeem == 'Y') {
-            loyaltyDiscount = calculateLoyaltyDiscount(customers[cIdx].loyaltyPoints, discountedSubtotal, pointsUsed);
-    }
+    if (useVoucher == 'Y') {
+        voucherDiscount = selectVoucher(vouchers, target->customerID, selectedVoucherID);
+
+        if (voucherDiscount > discountedSubtotal) { voucherDiscount = discountedSubtotal; }
     }
 
     // Calculate final subtotal
-    double finalSubtotal = discountedSubtotal - loyaltyDiscount;
+    double finalSubtotal = discountedSubtotal - voucherDiscount;
     double amountDue = finalSubtotal * (1.0 + SST_RATE);
 
-    if (processPayment(invoices, bookingID, subtotal, membershipDiscount, loyaltyDiscount, amountDue)) {
-        customers[cIdx].loyaltyPoints -= pointsUsed;
+    if (processPayment(invoices, bookingID, subtotal, membershipDiscount, voucherDiscount, amountDue)) {
+
+        // consume voucher
+        if (selectedVoucherID != -1) {
+            for (auto& voucher: vouchers) {
+                if (voucher.id == selectedVoucherID && voucher.status == "Available") {
+                    voucher.status = "Used";
+                    break;
+                }
+            }
+        }
 
         int pointsEarned = calculatePointsEarned(amountDue);
-        customers[cIdx].loyaltyPoints += pointsEarned;
+        customers[cIdx].earnedPoints += pointsEarned;
+        customers[cIdx].redeemablePoints += pointsEarned;
 
         showInfo("Loyalty Points Earned: " + to_string(pointsEarned));
 
@@ -312,7 +326,7 @@ bool payForBooking(vector<Invoice>& invoices, const vector<Booking>& bookings, c
 }
 
 void billingMenu( vector<Invoice>& invoices, const vector<Booking>& bookings, const vector<Package>& packages,
-                 vector<Customer>& customers) {
+                 vector<Customer>& customers, vector<Voucher>& vouchers) {
     int choice;
 
     do {
@@ -320,7 +334,7 @@ void billingMenu( vector<Invoice>& invoices, const vector<Booking>& bookings, co
 
         printCentered("1. Process Payment for a Booking");
         printCentered("2. View Sales Report            ");
-        printCentered("0. Back to Staff Menu        ");
+        printCentered("0. Back to Staff Menu           ");
 
         cout << endl;
         choice = getInt("Your choice: ", 0, 2);
@@ -337,7 +351,7 @@ void billingMenu( vector<Invoice>& invoices, const vector<Booking>& bookings, co
                     break;
                 }
 
-                payForBooking(invoices, bookings, packages, customers, bookingID);
+                payForBooking(invoices, bookings, packages, customers, vouchers, bookingID);
 
                 break;
             }

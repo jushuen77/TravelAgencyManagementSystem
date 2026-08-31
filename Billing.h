@@ -11,8 +11,9 @@ bool processPayment(std::vector<Invoice>& invoices, int bookingID, double subtot
 void generateInvoice(const Invoice& invoice, const Booking& booking, const Package& package, const Customer& customer);
 void generateSalesReport(const std::vector<Invoice>& invoices);
 bool payForBooking(std::vector<Invoice>& invoices, const std::vector<Booking>& bookings,
-                    const std::vector<Package>& packages, std::vector<Customer>& customers, int bookingID);
+                    const std::vector<Package>& packages, std::vector<Customer>& customers,
+                    std::vector<Voucher>& vouchers, int bookingID);
 void billingMenu(std::vector<Invoice>& invoices, const std::vector<Booking>& bookings,
-                  const std::vector<Package>& packages, std::vector<Customer>& customers);
+                  const std::vector<Package>& packages, std::vector<Customer>& customers, std::vector<Voucher>& vouchers);
 
 #endif

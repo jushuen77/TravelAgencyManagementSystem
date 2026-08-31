@@ -48,7 +48,8 @@ void printCentered(const string& text, int offset, bool newline) {
 
 void printField(const string& label, const string& value, int width) {
     int leftPadding = (SCREEN_WIDTH - width) / 2;
-
+    if (leftPadding < 0) leftPadding = 0;
+    
     cout << string(leftPadding, ' ')
          << right << setw(22) << label
          << value << endl;
@@ -62,6 +63,7 @@ void printTableRow(const vector<string>& values, const vector<int>& widths) {
     for (int width : widths) totalWidth += width;
 
     int leftPadding = (SCREEN_WIDTH - totalWidth) / 2;
+    if (leftPadding < 0) leftPadding = 0;
 
     cout << string(leftPadding, ' ');
 

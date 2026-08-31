@@ -13,7 +13,8 @@ struct Customer {
     std::string phone;
     std::string password;
     std::string membershipTier;
-    int loyaltyPoints;
+    int earnedPoints;
+    int redeemablePoints;
 };
 
 struct Staff {
@@ -49,6 +50,13 @@ struct Invoice {
     double totalAmount;
     std::string paymentMethod;
     std::string paymentStatus;
+};
+
+struct Voucher {
+    int id;
+    int customerID;
+    double value;
+    std::string status;
 };
 
 #endif

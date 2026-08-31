@@ -162,7 +162,9 @@ bool registerCustomer(vector<Customer>& customers) {
         return false;
     }
 
-    c.loyaltyPoints = STARTER_LOYALTY_POINTS;
+    c.earnedPoints = STARTER_LOYALTY_POINTS;
+    c.redeemablePoints = STARTER_LOYALTY_POINTS;
+
     c.id = nextCustomerID++;
 
     customers.push_back(c);
@@ -300,33 +302,37 @@ void printCustomerProfile(const Customer& c) {
     printField("Email: ", c.email);
     printField("Phone: ", c.phone);
     printField("Tier: ", c.membershipTier);
-    printField("Loyalty Points: ", to_string(c.loyaltyPoints));
+    printField("Earned Points: ", to_string(c.earnedPoints));
+    printField("Redeemable Points: ", to_string(c.redeemablePoints));
     showInfo("");
     cout << endl;
 }
 
-void displayAllCustomers(const vector<Customer>& customers) {
+bool displayAllCustomers(const vector<Customer>& customers) {
+    showSectionHeader("Registered Customers");
+
     if (customers.empty()) {
-        showInfo("No customers registered yet.");
-        return;
+        printCentered("No customers registered yet.");
+        return false;
     }
 
-    printCentered("Registered Customers");
-
-    vector<int> widths = {6, 20, 25, 15, 12, 10};
+    vector<int> widths = {6, 16, 23, 15, 12, 13, 15};
 
     printTableRow(
-        {"ID", "Name", "Email", "Phone", "Tier", "Points"},
+        {"ID", "Name", "Email", "Phone", "Tier", "Earned", "Redeemable"},
         widths);
 
-    printLine('-', 88);
+    printLine('-', 100);
 
     for (const auto &c : customers) {
         printTableRow(
-            {to_string(c.id), c.name, c.email, c.phone, c.membershipTier, to_string(c.loyaltyPoints)},
+            {to_string(c.id), c.name, c.email, c.phone, c.membershipTier, 
+                to_string(c.earnedPoints), to_string(c.redeemablePoints)},
             widths
         );
     }
+
+    return true;
 }
 
 void customerMenu(vector<Customer>& customers) {
@@ -350,7 +356,11 @@ void customerMenu(vector<Customer>& customers) {
                 break;
 
             case 2: {
-                displayAllCustomers(customers);
+                if (!displayAllCustomers(customers)) {
+                    showInfo("");
+                    break;
+                }
+
                 cout << endl;
                 int id = getInt("Enter customer ID (0 to cancel): ", 0, 999999);
 
@@ -364,8 +374,12 @@ void customerMenu(vector<Customer>& customers) {
             }
 
             case 3: {
-                displayAllCustomers(customers);
+                if (!displayAllCustomers(customers)) {
+                    showInfo("");
+                    break;
+                }
 
+                cout << endl;
                 int id = getInt("Enter customer ID (0 to cancel): ", 0, 999999);
 
                 if (id == 0) {
@@ -407,14 +421,6 @@ void customerMenu(vector<Customer>& customers) {
 
 int calculatePointsEarned(double amount) {
     return static_cast<int>(amount);
-}
-
-double calculateLoyaltyDiscount(int availablePoints, double subtotal, int& pointsUsed) {
-    int maxPoints = static_cast<int>(subtotal * 0.20 * 100);
-
-    pointsUsed = min(availablePoints, maxPoints);
-
-    return pointsUsed/100.0;
 }
 
 //the code pretty self explanatory idk what to explain\

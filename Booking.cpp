@@ -347,6 +347,7 @@ bool viewItinerary(const vector<Booking>& bookings, const vector<Package>& packa
                 printCentered("Package: " + packages[pIdx].name + " (" + packages[pIdx].destination + ")" +
                                 " | Departure: " + packages[pIdx].departureDate);
                 printCentered("Duration: " + to_string(packages[pIdx].days) + " days | People: " + to_string(b.numPeople));
+                cout << endl;
             }
         }
     }
