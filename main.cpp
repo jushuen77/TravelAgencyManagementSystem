@@ -5,6 +5,7 @@
 #include "Auth.h"
 #include "Utils.h"
 #include "Voucher.h"
+#include "Feedback.h"
 #include <vector>
 #include <iostream>
 using namespace std;
@@ -17,7 +18,8 @@ bool bookingBelongsTo(const vector<Booking>& bookings, int bookingID, int custom
 }
 
 void customerPortalMenu(int customerID, vector<Customer>& customers, vector<Booking>& bookings,
-                         vector<Package>& packages, vector<Invoice>& invoices, vector<Voucher>& vouchers) {
+                         vector<Package>& packages, vector<Invoice>& invoices, 
+                         vector<Voucher>& vouchers, vector<Feedback>& feedbacks) {
     int choice;
     do {
         showLogo();
@@ -36,10 +38,12 @@ void customerPortalMenu(int customerID, vector<Customer>& customers, vector<Book
         printCentered("6. Loyalty & Vouchers");
         printCentered("7. View My Profile   ");
         printCentered("8. Update My Profile ");
+        printCentered("9. Submit Feedback   ");
+        printCentered("10. View my Feedback ");
         printCentered("0. Logout            ");
         cout << endl;
 
-        choice = getInt("Your choice: ", 0, 8);
+        choice = getInt("Your choice: ", 0, 10);
         switch (choice) {
             case 1:
                 displayAvailablePackages(packages);
@@ -126,6 +130,12 @@ void customerPortalMenu(int customerID, vector<Customer>& customers, vector<Book
             case 8:
                 updateCustomer(customers, customerID);
                 break;
+            case 9:
+                submitFeedback(feedbacks, customerID);
+                break;
+            case 10:
+                viewMyFeedback(feedbacks, customerID);
+                showInfo("");
         }
     } while (choice != 0);
 
@@ -133,7 +143,8 @@ void customerPortalMenu(int customerID, vector<Customer>& customers, vector<Book
 }
 
 void staffMenu(vector<Customer>& customers, vector<Booking>& bookings,
-               vector<Package>& packages, vector<Invoice>& invoices, vector<Voucher>& vouchers) {
+               vector<Package>& packages, vector<Invoice>& invoices, 
+               vector<Voucher>& vouchers, vector<Feedback>& feedbacks) {
     int choice;
     do {
         showLogo();
@@ -141,14 +152,16 @@ void staffMenu(vector<Customer>& customers, vector<Booking>& bookings,
         printCentered("1. Customer Management             ");
         printCentered("2. Trip Package Booking & Itinerary");
         printCentered("3. Billing / Payment & Reporting   ");
+        printCentered("4. Customer Feedback               ");
         printCentered("0. Logout                          ");
         cout << endl;
 
-        choice = getInt("Your choice: ", 0, 3);
+        choice = getInt("Your choice: ", 0, 4);
         switch (choice) {
             case 1: customerMenu(customers); break;
             case 2: bookingMenu(bookings, packages, customers, invoices); break;
             case 3: billingMenu(invoices, bookings, packages, customers, vouchers); break;
+            case 4: feedbackMenu(feedbacks); break;
         }
     } while (choice != 0);
     printCentered("Logged out.");
@@ -161,6 +174,7 @@ int main() {
     vector<Booking> bookings;
     vector<Invoice> invoices;
     vector<Voucher> vouchers;
+    vector<Feedback> feedbacks;
     vector<Staff> staffList = createSampleStaff();
 
     int choice;
@@ -178,18 +192,18 @@ int main() {
         switch (choice) {
             case 1: {
                 int custID = customerLogin(customers);
-                if (custID != -1) customerPortalMenu(custID, customers, bookings, packages, invoices, vouchers);
+                if (custID != -1) customerPortalMenu(custID, customers, bookings, packages, invoices, vouchers, feedbacks);
                 break;
             }
             case 2: {
                 int custID = customerSignup(customers);
                 if (custID == -1) break;
                 showInfo("Account created! Logging you in...");
-                customerPortalMenu(custID, customers, bookings, packages, invoices, vouchers);
+                customerPortalMenu(custID, customers, bookings, packages, invoices, vouchers, feedbacks);
                 break;
             }
             case 3:
-                if (staffLogin(staffList)) staffMenu(customers, bookings, packages, invoices, vouchers);
+                if (staffLogin(staffList)) staffMenu(customers, bookings, packages, invoices, vouchers, feedbacks);
                 break;
             case 4:
                 cout << endl;

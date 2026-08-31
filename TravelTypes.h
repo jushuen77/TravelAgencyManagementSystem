@@ -59,4 +59,11 @@ struct Voucher {
     std::string status;
 };
 
+struct Feedback {
+    int id;
+    int customerID;
+    int rating;
+    std::string comment;
+};
+
 #endif
