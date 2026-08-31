@@ -39,30 +39,28 @@ bool emailExists(const vector<Customer>& customers,const string& email) {
     return false;
 }
 
+string calculateMembershipTier(int earnedPoints) {
+    if (earnedPoints >= 3000) return "Gold";
+    if (earnedPoints >= 1000) return "Silver";
+    return "Standard";
+}
 
-string chooseMembershipTier() {
-    cout << endl;
-    printCentered("Select membership tier");
-    printCentered("1. Standard");
-    printCentered("2. Silver  ");
-    printCentered("3. Gold    ");
-    cout << endl;
+void updateMembershipTier(Customer& customer) {
+    customer.membershipTier = calculateMembershipTier(customer.earnedPoints);
+}
 
-    int choice = getInt("Your choice: ", 0, 3);
+string getNextTier(int earnedPoints) {
+    if (earnedPoints >= 3000) return "Highest Tier";
+    if (earnedPoints >= 1000) return "Gold";
+    return "Silver";
+}
 
-    if (choice == 0)
-        return "";
+int getPointsToNextTier(int earnedPoints) {
+    if (earnedPoints >= 3000) return 0;
 
-    switch (choice) {
-        case 2:
-            return "Silver";
+    if (earnedPoints >= 1000) return 3000 - earnedPoints;
 
-        case 3:
-            return "Gold";
-
-        default:
-            return "Standard";
-    }
+    return 1000 - earnedPoints;
 }
 
 bool registerCustomer(vector<Customer>& customers) {
@@ -154,16 +152,9 @@ bool registerCustomer(vector<Customer>& customers) {
         break;
     }
 
-    // Membership tier
-    c.membershipTier = chooseMembershipTier();
-
-    if (c.membershipTier.empty()) {
-        showInfo("Registration cancelled.");
-        return false;
-    }
-
-    c.earnedPoints = STARTER_LOYALTY_POINTS;
+    c.earnedPoints = 0;
     c.redeemablePoints = STARTER_LOYALTY_POINTS;
+    c.membershipTier = "Standard";
 
     c.id = nextCustomerID++;
 
@@ -301,9 +292,19 @@ void printCustomerProfile(const Customer& c) {
     printField("Name: ", c.name);
     printField("Email: ", c.email);
     printField("Phone: ", c.phone);
+    cout << endl;
     printField("Tier: ", c.membershipTier);
     printField("Earned Points: ", to_string(c.earnedPoints));
     printField("Redeemable Points: ", to_string(c.redeemablePoints));
+    cout << endl;
+    if (c.earnedPoints >= 3000) {
+        printField("Next Tier: ", "Highest Tier");
+        printField("Points Required: ", "N/A");
+    } else {
+        printField("Next Tier: ", getNextTier(c.earnedPoints));
+        printField("Point Required: ", to_string(getPointsToNextTier(c.earnedPoints)));
+    }
+
     showInfo("");
     cout << endl;
 }

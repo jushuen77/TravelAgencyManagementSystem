@@ -2,6 +2,7 @@
 #define CUSTOMER_H
 #include <vector>
 #include <algorithm>
+#include <string>
 #include "TravelTypes.h"
 
 // Module 1: Customer / Member Management
@@ -13,8 +14,9 @@ bool deleteCustomer(std::vector<Customer>& customers, int id);
 bool displayAllCustomers(const std::vector<Customer>& customers);
 void printCustomerProfile(const Customer& c);
 void customerMenu(std::vector<Customer>& customers);
+std::string calculateMembershipTier(int earnedPoints);
+void updateMembershipTier(Customer& customer);
 
 int calculatePointsEarned(double amount);
 
 #endif
-

@@ -21,9 +21,13 @@ void customerPortalMenu(int customerID, vector<Customer>& customers, vector<Book
     int choice;
     do {
         showLogo();
+        cout << endl;
+        printCentered("Earn 1 loyalty point for each RM1 spent!");
+        printCentered("Purchase vouchers and earn membership benefits through loyalty points!");
         int idx = findCustomerByID(customers, customerID);
         string name = (idx == -1) ? "Customer" : customers[idx].name;
         showSectionHeader("Welcome, " + name + "! ");
+
         printCentered("1. Browse Packages   ");
         printCentered("2. Book a Package    ");
         printCentered("3. View My Itinerary ");

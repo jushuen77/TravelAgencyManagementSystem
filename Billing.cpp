@@ -311,9 +311,13 @@ bool payForBooking(vector<Invoice>& invoices, const vector<Booking>& bookings, c
             }
         }
 
+        // update earned & redeemable points
         int pointsEarned = calculatePointsEarned(amountDue);
         customers[cIdx].earnedPoints += pointsEarned;
         customers[cIdx].redeemablePoints += pointsEarned;
+
+        // update membership tier
+        updateMembershipTier(customers[cIdx]);
 
         showInfo("Loyalty Points Earned: " + to_string(pointsEarned));
 
