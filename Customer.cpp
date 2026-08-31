@@ -9,12 +9,14 @@ using namespace std;
 
 int nextCustomerID = 1;
 
+//use regex to verify if is valid email pattern
 bool isValidEmail(const string& email) {
     const regex pattern(R"(^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$)");
 
     return regex_match(email, pattern);
 }
 
+//use regex to verify same thing as email
 bool isValidPhone(const string& phone) {
     if (phone.size() < 7 || phone.size() > 15)
         return false;
@@ -27,6 +29,7 @@ bool isValidPhone(const string& phone) {
     return true;
 }
 
+//check if email exists
 bool emailExists(const vector<Customer>& customers,const string& email) {
     for (const auto& c : customers) {
         if (c.email == email)
@@ -35,6 +38,7 @@ bool emailExists(const vector<Customer>& customers,const string& email) {
 
     return false;
 }
+
 
 string chooseMembershipTier() {
     cout << endl;
@@ -79,7 +83,7 @@ bool registerCustomer(vector<Customer>& customers) {
         break;
     }
 
-    // Email
+    // Email (will keep trying to get user email, and only exit once one of the criteria below is hit)
     while (true) {
         string email = getString("Enter email: ", 0, -10);
 
@@ -102,7 +106,7 @@ bool registerCustomer(vector<Customer>& customers) {
         break;
     }
 
-    // Phone
+    // Phone (same logic as he email above)
     while (true) {
         string phone = getString("Enter phone number (digits only): ", 0, -21);
 
@@ -120,7 +124,7 @@ bool registerCustomer(vector<Customer>& customers) {
         break;
     }
 
-    // Password
+    // Password (same logic as above)
     while (true) {
         string password = getString("Create a password (min 4 characters): ", 0, -23);
 
@@ -169,6 +173,7 @@ bool registerCustomer(vector<Customer>& customers) {
     return true;
 }
 
+//find and get customer by their id
 int findCustomerByID(const vector<Customer>& customers,int id) {
     for (size_t i = 0; i < customers.size(); ++i) {
         if (customers[i].id == id)
@@ -178,6 +183,7 @@ int findCustomerByID(const vector<Customer>& customers,int id) {
     return -1;
 }
 
+//update customer details function
 bool updateCustomer(vector<Customer>& customers, int id) {
     int idx = findCustomerByID(customers, id);
 
@@ -265,6 +271,7 @@ bool updateCustomer(vector<Customer>& customers, int id) {
     showInfo("Customer updated successfully.");
     return true;
 }
+
 
 bool deleteCustomer(vector<Customer>& customers, int id) {
     int idx = findCustomerByID(customers, id);
@@ -409,3 +416,8 @@ double calculateLoyaltyDiscount(int availablePoints, double subtotal, int& point
 
     return pointsUsed/100.0;
 }
+
+//the code pretty self explanatory idk what to explain\
+//basically get arguments pass value then check if exsits or no
+//then maybe get user input will push pop or something into an list or array to store the data.
+//then a bunch of test cases and what not(input validation)
