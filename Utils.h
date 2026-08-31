@@ -8,7 +8,7 @@ extern const int SCREEN_WIDTH;
 // Display functions
 void printLine(char ch = '=', int length = SCREEN_WIDTH);
 void printCentered(const std::string& text, bool newline = true);
-void printCentered(const std::string& text, int offset);
+void printCentered(const std::string& text, int offset, bool newline = true);
 void printField(const std::string& label, const std::string& value, int width = 40);
 void printTableRow(const std::vector<std::string>& values, const std::vector<int>& widths);
 void showSectionHeader(const std::string& title);
@@ -23,5 +23,9 @@ int getInt(const std::string& prompt);
 int getInt(const std::string& prompt, int min, int max);
 double getDouble(const std::string& prompt);
 double getDouble(const std::string& prompt, double min, double max);
+
+// Time validation
+bool isValidDate(const std::string& date);
+bool isFutureDate(const std::string& date);
 
 #endif

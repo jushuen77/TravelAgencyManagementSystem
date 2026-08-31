@@ -42,24 +42,32 @@ void customerPortalMenu(int customerID, vector<Customer>& customers, vector<Book
             case 2:
                 bookPackage(bookings, packages, customerID);
                 break;
-            case 3:
-                viewItinerary(bookings, packages, invoices, customerID);
-                showInfo("");
+            case 3: {
+                bool found = viewItinerary(bookings, packages, invoices, customerID);
+                if (found) showInfo("");
                 break;
+            }
             case 4: {
-                viewItinerary(bookings, packages, invoices, customerID);
+                bool found = viewItinerary(bookings, packages, invoices, customerID);
+
+                if (!found) break;
+
                 cout << endl;
                 int bookingID = getInt("Enter your booking ID to cancel: ");
+
                 if (bookingID == 0) {
                     showInfo("Booking cancellation cancelled.");
                     break;
                 }
+
                 if (!bookingBelongsTo(bookings, bookingID, customerID)) showError("That booking does not belong to you");
                 else cancelBooking(bookings, packages, bookingID);
                 break;
             }
             case 5: {
                 viewItinerary(bookings, packages, invoices, customerID);
+                
+                cout << endl;
                 int bookingID = getInt("Enter your booking ID to pay for: ");
                 if (bookingID == 0) {
                     showInfo("Cancellation cancelled.");

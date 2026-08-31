@@ -25,20 +25,29 @@ double calculateTotal(double packagePrice, int numPeople, double discountRate) {
     return discounted * (1.0 + SST_RATE);
 }
 
-bool processPayment(vector<Invoice>& invoices, int bookingID, double amountDue) {
+bool processPayment(vector<Invoice>& invoices, int bookingID, double subtotal, double membershipDiscount, double loyaltyDiscount, double amountDue) {
     showSectionHeader("Process Payment");
-    printCentered(format("Amount due: RM{:.2f}", amountDue));
 
+    printField("Subtotal: ", format("RM{:.2f}", subtotal));
+    printField("Membership Discount: ", format("-RM{:.2f}", membershipDiscount));
+    printField("Loyalty Discount: ",format("-RM{:.2f}", loyaltyDiscount));
+
+    double tax = amountDue - (subtotal - membershipDiscount - loyaltyDiscount);
+    printField("SST Tax: ", format("RM{:.2f}", tax));
+    printField("Amount Due: ", format("RM{:.2f}", amountDue));
+
+    cout << endl;
     printCentered("Select Payment Method");
     printCentered("1. Cash    ");
     printCentered("2. Card    ");
     printCentered("3. E-Wallet");
     printCentered("0. Cancel  ");
 
+    cout << endl;
     int methodChoice = getInt("Your choice: ", 0, 3);
 
     if (methodChoice == 0) {
-        printCentered("Payment cancelled.");
+        showInfo("Payment cancelled.");
         return false;
     }
 
@@ -60,7 +69,7 @@ bool processPayment(vector<Invoice>& invoices, int bookingID, double amountDue) 
     }
 
     if (amountPaid < amountDue) {
-        showError(format("Insufficient payment. Amount due is ${:.2f}", amountDue));
+        showError(format("Insufficient payment. Amount due is RM{:.2f}", amountDue));
         return false;
     }
 
@@ -68,8 +77,9 @@ bool processPayment(vector<Invoice>& invoices, int bookingID, double amountDue) 
 
     inv.id = nextInvoiceID++;
     inv.bookingID = bookingID;
-    inv.subtotal = amountDue / (1.0 + SST_RATE);
-    inv.tax = amountDue - inv.subtotal;
+    inv.subtotal = subtotal;
+    inv.discount = membershipDiscount + loyaltyDiscount;
+    inv.tax = tax;
     inv.totalAmount = amountDue;
     inv.paymentMethod = method;
     inv.paymentStatus = "Paid";
@@ -77,21 +87,17 @@ bool processPayment(vector<Invoice>& invoices, int bookingID, double amountDue) 
     invoices.push_back(inv);
 
     if (amountPaid > amountDue) {
-        printCentered(format("Change due: ${:.2f}",amountPaid - amountDue));
+        printCentered(format("Change due: RM{:.2f}",amountPaid - amountDue));
     }
 
     return true;
 }
 
 void generateInvoice(const Invoice& invoice, const Booking& booking, const Package& package, const Customer& customer) {
+    showLogo();
     showSectionHeader("INVOICE");
 
     vector<int> widths = {20, 30};
-
-    printTableRow(
-        {"Field", "Row"},
-        widths
-    );
 
     printLine('-', 50);
 
@@ -132,22 +138,33 @@ void generateInvoice(const Invoice& invoice, const Booking& booking, const Packa
     );
 
     printTableRow(
+        {"Departure", package.departureDate},
+        {20, 30}
+    );
+
+    printTableRow(
         {"Duration", to_string(package.days) + " Days"},
         widths
     );
     
+    printLine('-', 50);
+    
     printTableRow(
-        {"Subtotal", "RM" + format("RM{:.2f}", invoice.subtotal)},
+        {"Subtotal", format("RM{:.2f}", invoice.subtotal)},
         widths
     );
 
     printTableRow(
-        {"SST Tax (6%)", "RM" + format("RM{:.2f}", invoice.tax)},
+        {"Discount", format("-RM{:.2f}", invoice.discount)},
+        widths
+    );
+    printTableRow(
+        {"SST Tax (6%)", format("RM{:.2f}", invoice.tax)},
         widths
     );
 
     printTableRow(
-        {"Total Paid", "RM" + format("RM{:.2f}", invoice.totalAmount)},
+        {"Total Paid", format("RM{:.2f}", invoice.totalAmount)},
         widths
     );
 
@@ -161,26 +178,14 @@ void generateInvoice(const Invoice& invoice, const Booking& booking, const Packa
         widths
     );
 
-    cout << fixed << setprecision(2);
+    printLine('-', 50);
 
-    cout << left << setw(20) << "  Invoice ID:" << invoice.id << "\n";
-
-    cout << left << setw(20) << "  Booking ID:" << invoice.bookingID << "\n";
-
-    cout << left << setw(20) << "  Subtotal:" << "$" << invoice.subtotal << "\n";
-
-    cout << left << setw(20) << "  SST Tax (6%):" << "$" << invoice.tax << "\n";
-
-    cout << left << setw(20) << "  Total Paid:" << "$" << invoice.totalAmount << "\n";
-
-    cout << left << setw(20) << "  Payment Method:" << invoice.paymentMethod << "\n";
-
-    cout << left << setw(20) << "  Status:" << invoice.paymentStatus << "\n";
-
-    cout << string(50, '=') << "\n";
+    showInfo("");
 }
 
 void generateSalesReport(const vector<Invoice>& invoices) {
+    showLogo();
+
     if (invoices.empty()) {
         showInfo("No transactions recorded yet.");
         return;
@@ -203,7 +208,7 @@ void generateSalesReport(const vector<Invoice>& invoices) {
 
     for (const auto& inv : invoices) {
         printTableRow(
-            {to_string(inv.id), to_string(inv.bookingID), inv.paymentMethod, format("${:.2f}", inv.totalAmount)},
+            {to_string(inv.id), to_string(inv.bookingID), inv.paymentMethod, format("RM{:.2f}", inv.totalAmount)},
             widths
         );
     }
@@ -211,8 +216,10 @@ void generateSalesReport(const vector<Invoice>& invoices) {
     printLine('-', 44);
 
     printField("Total Transactions: ", to_string(invoices.size()));
-    printField("Total Revenue: ", format("RM{:.2f}, totalRevenue"));
+    printField("Total Revenue: ", format("RM{:.2f}", totalRevenue));
     printField("Average Booking Value: ", format("RM{:.2f}", totalRevenue / invoices.size()));
+
+    showInfo("");
 }
 
 bool bookingAlreadyPaid(const vector<Invoice>& invoices,int bookingID) {
@@ -224,7 +231,7 @@ bool bookingAlreadyPaid(const vector<Invoice>& invoices,int bookingID) {
 }
 
 bool payForBooking(vector<Invoice>& invoices, const vector<Booking>& bookings, const vector<Package>& packages,
-                    const vector<Customer>& customers, int bookingID) {
+                    vector<Customer>& customers, int bookingID) {
 
     const Booking* target = nullptr;
 
@@ -259,11 +266,43 @@ bool payForBooking(vector<Invoice>& invoices, const vector<Booking>& bookings, c
 
     int cIdx = findCustomerByID(customers,target->customerID);
 
-    double discount = (cIdx == -1) ? 0.0 : getMembershipDiscount(customers[cIdx].membershipTier);
+    if (cIdx == -1) {
+        showError("Customer data missing for this booking");
+        return false;
+    }
 
-    double amountDue = calculateTotal(packages[pIdx].price, target->numPeople, discount);
+    double discountRate = getMembershipDiscount(customers[cIdx].membershipTier);
 
-    if (processPayment(invoices,bookingID,amountDue)) {
+    double subtotal = packages[pIdx].price * target->numPeople;
+
+    double membershipDiscount = subtotal * discountRate;
+
+    double discountedSubtotal = subtotal - membershipDiscount;
+
+    // Calculate loyalty discount
+    int pointsUsed = 0;
+    double loyaltyDiscount = 0.0;
+
+    if (customers[cIdx].loyaltyPoints > 0) {
+        char redeem = getChar("Would you like to redeem loyalty points (Y/N): ", true);
+
+        if (redeem == 'Y') {
+            loyaltyDiscount = calculateLoyaltyDiscount(customers[cIdx].loyaltyPoints, discountedSubtotal, pointsUsed);
+    }
+    }
+
+    // Calculate final subtotal
+    double finalSubtotal = discountedSubtotal - loyaltyDiscount;
+    double amountDue = finalSubtotal * (1.0 + SST_RATE);
+
+    if (processPayment(invoices, bookingID, subtotal, membershipDiscount, loyaltyDiscount, amountDue)) {
+        customers[cIdx].loyaltyPoints -= pointsUsed;
+
+        int pointsEarned = calculatePointsEarned(amountDue);
+        customers[cIdx].loyaltyPoints += pointsEarned;
+
+        showInfo("Loyalty Points Earned: " + to_string(pointsEarned));
+
         generateInvoice(invoices.back(), *target, packages[pIdx], customers[cIdx]);
 
         return true;
@@ -273,7 +312,7 @@ bool payForBooking(vector<Invoice>& invoices, const vector<Booking>& bookings, c
 }
 
 void billingMenu( vector<Invoice>& invoices, const vector<Booking>& bookings, const vector<Package>& packages,
-                 const vector<Customer>& customers) {
+                 vector<Customer>& customers) {
     int choice;
 
     do {
@@ -281,14 +320,16 @@ void billingMenu( vector<Invoice>& invoices, const vector<Booking>& bookings, co
 
         printCentered("1. Process Payment for a Booking");
         printCentered("2. View Sales Report            ");
-        printCentered("0. Back to Main Menu            ");
+        printCentered("0. Back to Staff Menu        ");
 
+        cout << endl;
         choice = getInt("Your choice: ", 0, 2);
 
         switch (choice) {
             case 1: {
                 viewAllBookings(bookings, packages, customers);
 
+                cout << endl;
                 int bookingID = getInt("Enter booking ID to pay for: ", 0, 999999);
 
                 if (bookingID == 0) {

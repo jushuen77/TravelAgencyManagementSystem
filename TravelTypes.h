@@ -29,6 +29,7 @@ struct Package {
     int days;
     double price;
     int seatsAvailable;
+    std::string departureDate;
 };
 
 struct Booking {
@@ -43,6 +44,7 @@ struct Invoice {
     int id;
     int bookingID;
     double subtotal;
+    double discount;
     double tax;
     double totalAmount;
     std::string paymentMethod;

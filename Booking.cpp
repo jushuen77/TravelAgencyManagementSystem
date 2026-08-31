@@ -13,11 +13,11 @@ int nextPackageID = 6;
 
 vector<Package> createSamplePackages() {
     return {
-        {1, "Bali Beach Escape",       "Bali, Indonesia",       4,  899.00, 20},
-        {2, "Tokyo City Explorer",     "Tokyo, Japan",          6, 2199.00, 15},
-        {3, "Swiss Alps Adventure",    "Zermatt, Switzerland",  7, 3499.00, 10},
-        {4, "Langkawi Island Getaway", "Langkawi, Malaysia",    3,  549.00, 25},
-        {5, "Paris Romance Tour",      "Paris, France",         5, 2799.00, 12}
+        {1, "Bali Beach Escape",       "Bali, Indonesia",       4,  899.00, 20, "15/09/2026"},
+        {2, "Tokyo City Explorer",     "Tokyo, Japan",          6, 2199.00, 15, "20/09/2026"},
+        {3, "Swiss Alps Adventure",    "Zermatt, Switzerland",  7, 3499.00, 10, "25/09/2026"},
+        {4, "Langkawi Island Getaway", "Langkawi, Malaysia",    3,  549.00, 25, "01/10/2026"},
+        {5, "Paris Romance Tour",      "Paris, France",         5, 2799.00, 12, "10/10/2026"}
     };
 }
 
@@ -36,21 +36,21 @@ void displayAvailablePackages(const vector<Package>& packages) {
         );
     }
 
-    vector<int> widths = {4, packageWidth + 2, destinationWidth + 2, 6, 13, 8};
+    vector<int> widths = {4, packageWidth + 2, destinationWidth + 2, 6, 13, 8, 12};
 
     showSectionHeader("Available Trip Packages");
 
     printTableRow(
-        {"ID", "Package", "Destination", "Days", "Price", "Seats"},
+        {"ID", "Package", "Destination", "Days", "Price", "Seats", "Date"},
         widths
     );
 
-    printLine('-', 75);
+    printLine('-', 87);
 
     for (const auto& p : packages) {
         printTableRow(
             {to_string(p.id), p.name, p.destination, to_string(p.days), format("RM{:.2f}", p.price),
-             to_string(p.seatsAvailable)},
+             to_string(p.seatsAvailable), p.departureDate},
             widths
         );
     }
@@ -67,15 +67,17 @@ int findPackageByID(const vector<Package>& packages, int id) {
 
 void addPackage(vector<Package>& packages) {
     Package p;
-
+    
+    showSectionHeader("Add Package");
+    cout << endl;
     printCentered("(Enter -1 at any prompt to cancel.)");
-
+    cout << endl;
     // Package name
     while (true) {
         string name = getString("Enter package name: ");
 
         if (name == "-1") {
-            printCentered("Package creation cancelled.");
+            showInfo("Package creation cancelled.");
             return;
         }
 
@@ -88,7 +90,7 @@ void addPackage(vector<Package>& packages) {
         string destination = getString("Enter destination: ");
 
         if (destination == "-1") {
-            printCentered("Package creation cancelled.");
+            showInfo("Package creation cancelled.");
             return;
         }
 
@@ -100,17 +102,17 @@ void addPackage(vector<Package>& packages) {
     int days = getInt("Enter duration (days): ", -1, 999);
 
     if (days == -1) {
-        printCentered("Package creation cancelled.");
+        showInfo("Package creation cancelled.");
         return;
     }
 
     p.days = days;
 
     // Price
-    double price = getDouble("Enter price per person: $", -1, 999999999);
+    double price = getDouble("Enter price per person: RM", -1, 999999999);
 
     if (price == -1) {
-        printCentered("Package creation cancelled.");
+        showInfo("Package creation cancelled.");
         return;
     }
 
@@ -120,20 +122,40 @@ void addPackage(vector<Package>& packages) {
     int seats = getInt("Enter number of seats available: ", -1, 999999);
 
     if (seats == -1) {
-        printCentered("Package creation cancelled.");
+        showInfo("Package creation cancelled.");
         return;
     }
-
+    
     p.seatsAvailable = seats;
 
+    // Departure Date
+    while (true) {
+        string departureDate = getString("Enter departure date (DD/MM/YYYY): ");
+
+        if (departureDate == "-1") {
+            showInfo("Package edit cancelled.");
+            return;
+        }
+
+        if (!isValidDate(departureDate)) {
+            showError("Invalid date. Please use DD/MM/YYYY");
+            continue;
+        }
+
+        if (!isFutureDate(departureDate)) {
+            showError("Departure date must be in the future");
+            continue;
+        }
+        
+        p.departureDate = departureDate;
+        break;
+    }
+    
     p.id = nextPackageID++;
 
     packages.push_back(p);
 
-    printCentered(
-        "Package added successfully. Assigned ID: "
-        + to_string(p.id)
-    );
+    showInfo("Package added successfully. Assigned ID: "+ to_string(p.id));
 }
 
 bool editPackage(vector<Package>& packages, int id) {
@@ -152,7 +174,7 @@ bool editPackage(vector<Package>& packages, int id) {
     string name = getString("Enter new name: ");
 
     if (name == "-1") {
-        printCentered("Package edit cancelled.");
+        showInfo("Package edit cancelled.");
         return false;
     }
 
@@ -160,7 +182,7 @@ bool editPackage(vector<Package>& packages, int id) {
     string destination = getString("Enter new destination: ");
 
     if (destination == "-1") {
-        printCentered("Package edit cancelled.");
+        showInfo("Package edit cancelled.");
         return false;
     }
 
@@ -168,15 +190,15 @@ bool editPackage(vector<Package>& packages, int id) {
     int days = getInt("Enter new duration in days: ", -1, 999);
 
     if (days == -1) {
-        printCentered("Package edit cancelled.");
+        showInfo("Package edit cancelled.");
         return false;
     }
 
     // Price
-    double price = getDouble("Enter new price: $", -1, 999999999);
+    double price = getDouble("Enter new price: RM", -1, 999999999);
 
     if (price == -1) {
-        printCentered("Package edit cancelled.");
+        showInfo("Package edit cancelled.");
         return false;
     }
 
@@ -184,7 +206,15 @@ bool editPackage(vector<Package>& packages, int id) {
     int seats = getInt("Enter new seats available: ", -1, 999999);
 
     if (seats == -1) {
-        printCentered("Package edit cancelled.");
+        showInfo("Package edit cancelled.");
+        return false;
+    }
+
+    // Departure Date
+    string departureDate = getString("Enter departure date (DD/MM/YYYY): ");
+
+    if (departureDate == "-1") {
+        showInfo("Package edit cancelled.");
         return false;
     }
 
@@ -194,7 +224,7 @@ bool editPackage(vector<Package>& packages, int id) {
     p.days = days;
     p.price = price;
     p.seatsAvailable = seats;
-
+    p.departureDate = departureDate;
     printCentered("Package updated successfully.");
     return true;
 }
@@ -202,7 +232,7 @@ bool editPackage(vector<Package>& packages, int id) {
 bool bookPackage(vector<Booking>& bookings, vector<Package>& packages, int customerID) {
     displayAvailablePackages(packages);
 
-    cout << "";
+    cout << endl;
     printCentered("(Enter 0 at any prompt to cancel)");
 
     // Package ID
@@ -250,11 +280,26 @@ bool bookPackage(vector<Booking>& bookings, vector<Package>& packages, int custo
     return true;
 }
 
+bool hasActiveBooking(const vector<Booking>& bookings, int customerID) {
+    for (const auto& b : bookings) {
+        if (b.customerID == customerID && b.status != "Cancelled")
+            return true;
+    }
+
+    return false;
+}
+
 bool cancelBooking(vector<Booking>& bookings, vector<Package>& packages, int bookingID) {
     for (auto& b : bookings) {
         if (b.id == bookingID) {
             if (b.status == "Cancelled") {
                 printCentered("Booking already cancelled.");
+                return false;
+            }
+
+            char confirm = getChar("Are you sure you want to cancel booking (Y/N): ", true);
+            if (confirm == 'N') {
+                showInfo("Booking cancellation cancelled.");
                 return false;
             }
 
@@ -264,12 +309,8 @@ bool cancelBooking(vector<Booking>& bookings, vector<Package>& packages, int boo
                 packages[pIdx].seatsAvailable += b.numPeople;
 
             b.status = "Cancelled";
-
-            printCentered(
-                "Booking "
-                + to_string(bookingID)
-                + " cancelled."
-            );
+            
+            showInfo("Booking "+ to_string(bookingID)+ " cancelled.");
 
             return true;
         }
@@ -279,14 +320,14 @@ bool cancelBooking(vector<Booking>& bookings, vector<Package>& packages, int boo
     return false;
 }
 
-void viewItinerary(const vector<Booking>& bookings, const vector<Package>& packages, const vector<Invoice>& invoices,
+bool viewItinerary(const vector<Booking>& bookings, const vector<Package>& packages, const vector<Invoice>& invoices,
                     int customerID) {
     bool found = false;
 
     showSectionHeader("Itinerary for Customer ID "+ to_string(customerID));
 
     for (const auto& b : bookings) {
-        if (b.customerID == customerID) {
+        if (b.customerID == customerID && b.status != "Cancelled") {
             found = true;
 
             string paymentStatus = "Unpaid";
@@ -303,7 +344,8 @@ void viewItinerary(const vector<Booking>& bookings, const vector<Package>& packa
             printCentered("Booking ID: " + to_string(b.id) + " | " + "Status: " + b.status + " | Payment: " + paymentStatus);
 
             if (pIdx != -1) {
-                printCentered("Package: " + packages[pIdx].name + " (" + packages[pIdx].destination + ")");
+                printCentered("Package: " + packages[pIdx].name + " (" + packages[pIdx].destination + ")" +
+                                " | Departure: " + packages[pIdx].departureDate);
                 printCentered("Duration: " + to_string(packages[pIdx].days) + " days | People: " + to_string(b.numPeople));
             }
         }
@@ -311,6 +353,8 @@ void viewItinerary(const vector<Booking>& bookings, const vector<Package>& packa
 
     if (!found)
         showInfo("No bookings found for this customer.");
+
+    return found;
 }
 
 void viewAllBookings(const vector<Booking>& bookings,const vector<Package>& packages,
@@ -374,6 +418,7 @@ void bookingMenu(vector<Booking>& bookings,vector<Package>& packages, const vect
         printCentered("7. View All Bookings            ", 5);
         printCentered("0. Back to Main Menu            ", 5);
 
+        cout << endl;
         choice = getInt("Your choice: ", 0, 7);
 
         switch (choice) {
@@ -389,6 +434,7 @@ void bookingMenu(vector<Booking>& bookings,vector<Package>& packages, const vect
             case 3: {
                 displayAvailablePackages(packages);
 
+                cout << endl;
                 int pID = getInt("Enter package ID to edit: ", 0, 999999);
 
                 if (pID == 0) {
@@ -451,6 +497,7 @@ void bookingMenu(vector<Booking>& bookings,vector<Package>& packages, const vect
 
             case 7:
                 viewAllBookings(bookings, packages, customers);
+                showInfo("");
                 break;
         }
 

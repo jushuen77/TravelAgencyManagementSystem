@@ -3,19 +3,16 @@
 #include <iostream>
 #include <iomanip>
 #include <cctype>
+#include <algorithm>
+#include <regex>
 using namespace std;
 
 int nextCustomerID = 1;
 
 bool isValidEmail(const string& email) {
-    size_t at = email.find('@');
+    const regex pattern(R"(^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$)");
 
-    if (at == string::npos || at == 0)
-        return false;
-
-    size_t dot = email.find('.', at);
-
-    return dot != string::npos && dot < email.size() - 1;
+    return regex_match(email, pattern);
 }
 
 bool isValidPhone(const string& phone) {
@@ -30,10 +27,7 @@ bool isValidPhone(const string& phone) {
     return true;
 }
 
-bool emailExists(
-    const vector<Customer>& customers,
-    const string& email
-) {
+bool emailExists(const vector<Customer>& customers,const string& email) {
     for (const auto& c : customers) {
         if (c.email == email)
             return true;
@@ -175,10 +169,7 @@ bool registerCustomer(vector<Customer>& customers) {
     return true;
 }
 
-int findCustomerByID(
-    const vector<Customer>& customers,
-    int id
-) {
+int findCustomerByID(const vector<Customer>& customers,int id) {
     for (size_t i = 0; i < customers.size(); ++i) {
         if (customers[i].id == id)
             return static_cast<int>(i);
@@ -405,4 +396,16 @@ void customerMenu(vector<Customer>& customers) {
         }
 
     } while (choice != 0);
+}
+
+int calculatePointsEarned(double amount) {
+    return static_cast<int>(amount);
+}
+
+double calculateLoyaltyDiscount(int availablePoints, double subtotal, int& pointsUsed) {
+    int maxPoints = static_cast<int>(subtotal * 0.20 * 100);
+
+    pointsUsed = min(availablePoints, maxPoints);
+
+    return pointsUsed/100.0;
 }

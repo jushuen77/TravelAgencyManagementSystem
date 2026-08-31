@@ -4,6 +4,8 @@
 #include <string>
 #include <format>
 #include <vector>
+#include <ctime>
+#include <sstream>
 #include <stdexcept>
 using namespace std;
 
@@ -29,14 +31,18 @@ void printCentered(const string& text, bool newline) {
     }
 }
 
-void printCentered(const string& text, int offset) {
+void printCentered(const string& text, int offset, bool newline) {
     int length = static_cast<int>(text.length());
 
     if (length >= SCREEN_WIDTH) {
         cout << text;
     } else {
         int leftPadding = (SCREEN_WIDTH - length) / 2 + offset;
-        cout << string(leftPadding, ' ') << text << endl;
+        cout << string(leftPadding, ' ') << text;
+    }
+
+    if (newline) {
+        cout << endl;
     }
 }
 
@@ -44,7 +50,7 @@ void printField(const string& label, const string& value, int width) {
     int leftPadding = (SCREEN_WIDTH - width) / 2;
 
     cout << string(leftPadding, ' ')
-         << right << setw(18) << label
+         << right << setw(22) << label
          << value << endl;
 }
 
@@ -108,7 +114,7 @@ string getString(const string& prompt, int length, int offset) {
     string input;
 
     while (true) {
-        printCentered(prompt, offset);
+        printCentered(prompt, offset, false);
 
         if (!getline(cin, input)) {
             showError("Input stream closed. Exiting program");
@@ -257,4 +263,57 @@ double getDouble(const string& prompt, double min, double max) {
             showError("The number is too large or too small");
         }
     }
+}
+
+bool isValidDate(const string& date) {
+    int day, month, year;
+    char separator1, separator2;
+
+    stringstream ss(date);
+    
+    ss >> day >> separator1 >> month >> separator2 >> year;
+
+    // Check format
+    if (ss.fail() || separator1 != '/' || separator2 != '/')
+        return false;
+
+    // Check year and month
+    if (year < 1 || month < 1 || month > 12)
+        return false;
+
+    int daysInMonth[] = {
+        31, 28, 31, 30, 31, 30,
+        31, 31, 30, 31, 30, 31
+    };
+
+    // Leap year
+    if (month == 2 &&
+        (year % 400 == 0 ||
+        (year % 4 == 0 && year % 100 != 0))) {
+        daysInMonth[1] = 29;
+    }
+
+    return day >= 1 && day <= daysInMonth[month - 1];
+}
+
+bool isFutureDate(const string& date) {
+    if (!isValidDate(date))
+        return false;
+
+    int day, month, year;
+    char separator1, separator2;
+
+    stringstream ss(date);
+    ss >> day >> separator1 >> month >> separator2 >> year;
+
+    time_t currentTime = time(nullptr);
+    tm* today = localtime(&currentTime);
+
+    if (year != today->tm_year + 1900)
+        return year > today->tm_year + 1900;
+
+    if (month != today->tm_mon + 1)
+        return month > today->tm_mon + 1;
+
+    return day > today->tm_mday;
 }
