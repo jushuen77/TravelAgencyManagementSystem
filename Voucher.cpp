@@ -148,7 +148,7 @@ double selectVoucher(vector<Voucher>& vouchers, int customerID, int& selectedVou
         }
     }
 
-    // No avialable vouchers
+    // No available vouchers
     if (availableIndexes.empty()) { 
         showInfo("You do not have any available vouchers.");
         return 0.0; 
@@ -178,7 +178,7 @@ double selectVoucher(vector<Voucher>& vouchers, int customerID, int& selectedVou
 
     cout << endl;
 
-    int choice = getInt("Select voucher (0 to cancel): ", 0, static_cast<int>(availableIndexes.size()));
+    int choice = getInt("Select voucher (0 to cancel): ");
 
     if (choice == 0) {
         showInfo("Voucher selection cancelled.");
